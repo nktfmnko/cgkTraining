@@ -72,6 +72,51 @@ class _TrainingState extends State<Training> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(200, 29, 90, 130),
+      ),
+      body: ValueUnionStateListener<List<QA>>(
+          unionListenable: qaState,
+          contentBuilder: (content) {
+            return Scaffold(
+              backgroundColor: const Color.fromARGB(200, 29, 82, 117),
+              body: Column(
+                children: [
+                  Text(content[0].question),
+                ],
+              ),
+            );
+          },
+          loadingBuilder: () {
+            return SafeArea(
+                child: Scaffold(
+                  backgroundColor: Color.fromARGB(200, 29, 82, 117),
+                  body: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white60,
+                    ),
+                  ),
+                ));
+          },
+          errorBuilder: () {
+            return Scaffold(
+              backgroundColor: Color.fromARGB(200, 29, 82, 117),
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Ошибка, перезагрузите страницу'),
+                    ElevatedButton(
+                        onPressed: () {
+                          updateScreen();
+                        },
+                        child: Text('Обновить'))
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
   }
 }
