@@ -70,6 +70,8 @@ class _TrainingState extends State<Training> {
     super.dispose();
   }
 
+  int i = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,26 +84,84 @@ class _TrainingState extends State<Training> {
             return Scaffold(
               backgroundColor: const Color.fromARGB(200, 29, 82, 117),
               body: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(content[0].question),
+                  Row(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          if (i != 0) {
+                            i--;
+                          } else {
+                            return;
+                          }
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                        iconSize: 50,
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: SizedBox(
+                            height: 200,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.black12,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(2)),
+                              ),
+                              child: SingleChildScrollView(
+                                key: ValueKey(i),
+                                scrollDirection: Axis.vertical,
+                                child: Text(content[i].question),
+                              ),
+                            ),
+                          )),
+                      IconButton(
+                          iconSize: 50,
+                          onPressed: () {
+                            if (i < content.length - 1) {
+                              i++;
+                            } else {
+                              return;
+                            }
+                            setState(() {});
+                          },
+                          icon: Icon(Icons.arrow_forward_ios_rounded))
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 250,
+                        height: 45,
+                        child: ElevatedButton(
+                            onPressed: () {}, child: Text('Вопрос взят')),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             );
           },
-          loadingBuilder: () {
+          loadingBuilder: () {gi
             return SafeArea(
                 child: Scaffold(
-                  backgroundColor: Color.fromARGB(200, 29, 82, 117),
-                  body: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white60,
-                    ),
-                  ),
-                ));
+              backgroundColor: const Color.fromARGB(200, 29, 82, 117),
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white60,
+                ),
+              ),
+            ));
           },
           errorBuilder: () {
             return Scaffold(
-              backgroundColor: Color.fromARGB(200, 29, 82, 117),
+              backgroundColor: const Color.fromARGB(200, 29, 82, 117),
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
