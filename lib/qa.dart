@@ -119,13 +119,7 @@ class _TrainingState extends State<Training> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                children: [
-                  Container(
-                    height: 130,
-                  )
-                ],
-              ),
+              const SizedBox(height: 130),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
