@@ -102,7 +102,18 @@ class _TrainingState extends State<Training> {
         contentBuilder: (content) {
           if (content.isEmpty) {
             return Center(
-              child: Text('ПУСТО'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Ошибка, перезагрузите страницу'),
+                  ElevatedButton(
+                    onPressed: () {
+                      updateScreen();
+                    },
+                    child: Text('Обновить'),
+                  ),
+                ],
+              ),
             );
           }
           return Column(
