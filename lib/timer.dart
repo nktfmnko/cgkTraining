@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class StateTimerPage extends StatefulWidget {
   final int waitTimeInSec;
@@ -10,6 +12,7 @@ class StateTimerPage extends StatefulWidget {
   _StateTimerPageState createState() => _StateTimerPageState();
 }
 
+// Класс Таймера
 class _StateTimerPageState extends State<StateTimerPage> {
   Timer? _timer;
   late int _waitTime;
@@ -19,7 +22,6 @@ class _StateTimerPageState extends State<StateTimerPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _waitTime = widget.waitTimeInSec;
     _calculateTime();
@@ -27,11 +29,11 @@ class _StateTimerPageState extends State<StateTimerPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _timer?.cancel();
   }
 
+  // Функция кнопки Старт
   void start(BuildContext context) {
     if (_waitTime > 0) {
       setState(() {
@@ -48,11 +50,13 @@ class _StateTimerPageState extends State<StateTimerPage> {
     }
   }
 
+  // Функция кнопки Перезагрузки
   void restart() {
     _waitTime = widget.waitTimeInSec;
     _calculateTime();
   }
 
+  // Функция кнопки Паузы
   void pause() {
     _timer?.cancel();
     setState(() {
@@ -60,6 +64,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     });
   }
 
+  // Дополнительная функция для вычисления времени
   void _calculateTime() {
     var minuteStr = (_waitTime ~/ 60).toString().padLeft(2, '0');
     var secondStr = (_waitTime % 60).toString().padLeft(2, '0');
@@ -74,7 +79,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color.fromARGB(200, 29, 82, 117),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +94,8 @@ class _StateTimerPageState extends State<StateTimerPage> {
                       child: CircularProgressIndicator(
                         value: _percent,
                         backgroundColor: Colors.red,
-                        strokeWidth: 10,
+                        strokeWidth: 11,
+                        color: Colors.blue,
                       ),
                     ),
                     Positioned(
@@ -112,20 +118,22 @@ class _StateTimerPageState extends State<StateTimerPage> {
                       width: size.height * 0.15,
                       margin: const EdgeInsets.all(20),
                       child: FloatingActionButton(
+                          backgroundColor: Colors.blue,
                           onPressed: (){
                             isStart ? pause() : start(context);
                           },
-                          child: isStart ? const Icon(Icons.pause) : const Icon(Icons.play_arrow_outlined)),
+                          child: isStart ? const Icon(Icons.pause, size: 80,) : const Icon(Icons.play_arrow_outlined, size: 80,)),
                     ),
                     Container(
                       height: size.height * 0.15,
                       width: size.height * 0.15,
                       margin: const EdgeInsets.all(20),
                       child: FloatingActionButton(
+                        backgroundColor: Colors.blue,
                           onPressed: (){
                             restart();
                           },
-                          child: const Icon(Icons.restart_alt)),
+                          child: const Icon(Icons.restart_alt, size: 80,)),
                     ),
                   ],
                 ),
