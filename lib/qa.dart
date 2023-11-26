@@ -93,7 +93,7 @@ class _TrainingState extends State<Training> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(200, 29, 82, 117),
+      backgroundColor: Color(0xff33A3FF),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(200, 29, 90, 130),
       ),
@@ -144,7 +144,7 @@ class _TrainingState extends State<Training> {
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            color: Colors.black12,
+                            color: const Color(0x666B90D4),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(20),
                             ),
@@ -152,7 +152,6 @@ class _TrainingState extends State<Training> {
                           child: InkWell(
                             highlightColor: Colors.black26,
                             splashColor: Colors.black12,
-                            //splashColor: Colors.black,
                             borderRadius: const BorderRadius.all(
                               Radius.circular(20),
                             ),
@@ -209,8 +208,8 @@ class _TrainingState extends State<Training> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.black12),
-                      shadowColor: MaterialStateProperty.all(Colors.black12),
+                          MaterialStateProperty.all(Color(0x404577D4)),
+                      shadowColor: MaterialStateProperty.all(Color(0x404577D4)),
                       overlayColor: MaterialStateProperty.all(Colors.black12),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
