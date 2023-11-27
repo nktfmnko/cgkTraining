@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class StateTimerPage extends StatefulWidget {
-  final int waitTimeInSec;
-  const StateTimerPage({Key? key, required this.waitTimeInSec}) : super(key: key);
+  const StateTimerPage({Key? key}) : super(key: key);
 
   @override
   _StateTimerPageState createState() => _StateTimerPageState();
@@ -23,7 +22,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
   @override
   void initState() {
     super.initState();
-    _waitTime = widget.waitTimeInSec;
+    _waitTime = 60;
     _calculateTime();
   }
 
@@ -52,7 +51,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
 
   // Функция кнопки Перезагрузки
   void restart() {
-    _waitTime = widget.waitTimeInSec;
+    _waitTime = 60;
     _calculateTime();
   }
 
@@ -69,7 +68,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     var minuteStr = (_waitTime ~/ 60).toString().padLeft(2, '0');
     var secondStr = (_waitTime % 60).toString().padLeft(2, '0');
     setState(() {
-      _percent = _waitTime / widget.waitTimeInSec;
+      _percent = _waitTime / 60;
       timeStr = '$minuteStr:$secondStr';
     });
   }
@@ -79,7 +78,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-          backgroundColor: const Color.fromARGB(200, 29, 82, 117),
+          backgroundColor: const Color(0xff3987c8),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -95,7 +94,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                         value: _percent,
                         backgroundColor: Colors.red,
                         strokeWidth: 11,
-                        color: Colors.blue,
+                        color: const Color(0xff418ecd),
                       ),
                     ),
                     Positioned(
@@ -118,7 +117,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                       width: size.height * 0.15,
                       margin: const EdgeInsets.all(20),
                       child: FloatingActionButton(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: const Color(0xff418ecd),
                           onPressed: (){
                             isStart ? pause() : start(context);
                           },
@@ -129,7 +128,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                       width: size.height * 0.15,
                       margin: const EdgeInsets.all(20),
                       child: FloatingActionButton(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: const Color(0xff418ecd),
                           onPressed: (){
                             restart();
                           },

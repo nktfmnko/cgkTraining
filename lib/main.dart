@@ -2,8 +2,6 @@ import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const waitTime = 60;
-
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://eughueucuzinthtorkyt.supabase.co',
@@ -12,7 +10,7 @@ Future<void> main() async {
   );
   //Раскомментировать, и написать название виджета, который вы вызываете
   runApp(const MaterialApp(
-      home: StateTimerPage(waitTimeInSec: waitTime)),
+      home: StateTimerPage()),
   );
 }
 
