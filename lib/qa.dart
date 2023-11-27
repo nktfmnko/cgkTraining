@@ -46,7 +46,9 @@ class Training extends StatefulWidget {
 
 class _TrainingState extends State<Training> {
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
-  final answered = <QA>[];
+  final answered = <int>[];
+  int questionIndex = 0;
+  final moved = <int>{};
 
   //чтение данных из бд
   Future<List<QA>> readData() async {
@@ -88,8 +90,6 @@ class _TrainingState extends State<Training> {
     super.dispose();
   }
 
-  int i = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,8 +125,8 @@ class _TrainingState extends State<Training> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      if (i != 0) {
-                        i--;
+                      if (questionIndex != 0) {
+                        questionIndex--;
                       } else {
                         return;
                       }
@@ -162,7 +162,7 @@ class _TrainingState extends State<Training> {
                                   return AlertDialog(
                                     contentPadding: const EdgeInsets.all(24),
                                     content: Text(
-                                      content[i].question,
+                                      content[questionIndex].question,
                                       textAlign: TextAlign.center,
                                     ),
                                     backgroundColor: Colors.blueGrey,
@@ -173,10 +173,10 @@ class _TrainingState extends State<Training> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: SingleChildScrollView(
-                                key: ValueKey(i),
+                                key: ValueKey(questionIndex),
                                 scrollDirection: Axis.vertical,
                                 child: Text(
-                                  content[i].question,
+                                  content[questionIndex].question,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 18,
@@ -190,11 +190,12 @@ class _TrainingState extends State<Training> {
                   IconButton(
                     iconSize: 50,
                     onPressed: () {
-                      if (i < content.length - 1) {
-                        i++;
+                      if (questionIndex < content.length - 1) {
+                        questionIndex++;
                       } else {
                         return;
                       }
+                      moved.add(content[questionIndex].id);
                       setState(() {});
                     },
                     icon: const Icon(Icons.arrow_forward_ios_rounded),
@@ -210,7 +211,8 @@ class _TrainingState extends State<Training> {
                     style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all(const Color(0xff418ecd)),
-                      shadowColor: MaterialStateProperty.all(const Color(0xff418ecd)),
+                      shadowColor:
+                          MaterialStateProperty.all(const Color(0xff418ecd)),
                       overlayColor: MaterialStateProperty.all(Colors.black12),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
@@ -226,7 +228,7 @@ class _TrainingState extends State<Training> {
                           return AlertDialog(
                             contentPadding: const EdgeInsets.all(24),
                             content: Text(
-                              content[i].answer,
+                              content[questionIndex].answer,
                               textAlign: TextAlign.center,
                             ),
                             backgroundColor: Colors.blueGrey,
@@ -257,23 +259,30 @@ class _TrainingState extends State<Training> {
                             width: 250,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: answered.contains(content[i])
+                              onPressed: answered
+                                      .contains(content[questionIndex].id)
                                   ? null
                                   : () {
-                                      answered.add(content[i]);
+                                      answered.add(content[questionIndex].id);
                                       setState(
                                         () {},
                                       );
                                     },
                               style: ButtonStyle(
-                                backgroundColor: answered.contains(content[i])
-                                    ? MaterialStateProperty.all(const Color(0xff235d8c))
-                                    : MaterialStateProperty.all(const Color(0xff418ecd)),
-                                shadowColor: answered.contains(content[i])
-                                    ? MaterialStateProperty.all(const Color(0xff235d8c))
-                                    : MaterialStateProperty.all(const Color(0xff418ecd)),
-                                overlayColor:
-                                    MaterialStateProperty.all(const Color(0xff235d8c)),
+                                backgroundColor:
+                                    answered.contains(content[questionIndex].id)
+                                        ? MaterialStateProperty.all(
+                                            const Color(0xff235d8c))
+                                        : MaterialStateProperty.all(
+                                            const Color(0xff418ecd)),
+                                shadowColor:
+                                    answered.contains(content[questionIndex].id)
+                                        ? MaterialStateProperty.all(
+                                            const Color(0xff235d8c))
+                                        : MaterialStateProperty.all(
+                                            const Color(0xff418ecd)),
+                                overlayColor: MaterialStateProperty.all(
+                                    const Color(0xff235d8c)),
                                 shape: MaterialStateProperty.all<
                                     RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -317,13 +326,16 @@ class _TrainingState extends State<Training> {
                 const Text('Ошибка, перезагрузите страницу'),
                 ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(const Color(0xff418ecd)),
-                    shadowColor: MaterialStateProperty.all(const Color(0xff418ecd)),
+                    backgroundColor:
+                        MaterialStateProperty.all(const Color(0xff418ecd)),
+                    shadowColor:
+                        MaterialStateProperty.all(const Color(0xff418ecd)),
                   ),
                   onPressed: () {
                     updateScreen();
                   },
-                  child: const Text('Обновить', style: TextStyle(color: Colors.black)),
+                  child: const Text('Обновить',
+                      style: TextStyle(color: Colors.black)),
                 ),
               ],
             ),
