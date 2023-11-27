@@ -78,6 +78,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
+          appBar: AppBar(backgroundColor: const Color(0xff418ecd),),
           backgroundColor: const Color(0xff3987c8),
           body: Center(
             child: Column(
