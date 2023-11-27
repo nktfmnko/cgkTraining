@@ -93,9 +93,9 @@ class _TrainingState extends State<Training> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff33A3FF),
+      backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(200, 29, 90, 130),
+        backgroundColor: const Color(0xff418ecd),
       ),
       body: ValueUnionStateListener<List<QA>>(
         unionListenable: qaState,
@@ -110,7 +110,7 @@ class _TrainingState extends State<Training> {
                     onPressed: () {
                       updateScreen();
                     },
-                    child: Text('Обновить'),
+                    child: const Text('Обновить'),
                   ),
                 ],
               ),
@@ -144,14 +144,14 @@ class _TrainingState extends State<Training> {
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            color: const Color(0x666B90D4),
+                            color: const Color(0xbf418ecd),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(20),
                             ),
                           ),
                           child: InkWell(
-                            highlightColor: Colors.black26,
-                            splashColor: Colors.black12,
+                            highlightColor: Colors.black38,
+                            splashColor: Colors.black26,
                             borderRadius: const BorderRadius.all(
                               Radius.circular(20),
                             ),
@@ -177,7 +177,8 @@ class _TrainingState extends State<Training> {
                                 scrollDirection: Axis.vertical,
                                 child: Text(
                                   content[i].question,
-                                  style: TextStyle(
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
                                     fontSize: 18,
                                   ),
                                 ),
@@ -196,7 +197,7 @@ class _TrainingState extends State<Training> {
                       }
                       setState(() {});
                     },
-                    icon: Icon(Icons.arrow_forward_ios_rounded),
+                    icon: const Icon(Icons.arrow_forward_ios_rounded),
                     color: Colors.black45,
                   )
                 ],
@@ -208,13 +209,13 @@ class _TrainingState extends State<Training> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(Color(0x404577D4)),
-                      shadowColor: MaterialStateProperty.all(Color(0x404577D4)),
+                          MaterialStateProperty.all(const Color(0xff418ecd)),
+                      shadowColor: MaterialStateProperty.all(const Color(0xff418ecd)),
                       overlayColor: MaterialStateProperty.all(Colors.black12),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: Colors.black),
+                          side: const BorderSide(color: Colors.black),
                         ),
                       ),
                     ),
@@ -233,7 +234,7 @@ class _TrainingState extends State<Training> {
                         },
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'Ответ',
                       style: TextStyle(
                         color: Colors.black,
@@ -266,22 +267,22 @@ class _TrainingState extends State<Training> {
                                     },
                               style: ButtonStyle(
                                 backgroundColor: answered.contains(content[i])
-                                    ? MaterialStateProperty.all(Colors.black45)
-                                    : MaterialStateProperty.all(Colors.black12),
+                                    ? MaterialStateProperty.all(const Color(0xff235d8c))
+                                    : MaterialStateProperty.all(const Color(0xff418ecd)),
                                 shadowColor: answered.contains(content[i])
-                                    ? MaterialStateProperty.all(Colors.black45)
-                                    : MaterialStateProperty.all(Colors.black12),
+                                    ? MaterialStateProperty.all(const Color(0xff235d8c))
+                                    : MaterialStateProperty.all(const Color(0xff418ecd)),
                                 overlayColor:
-                                    MaterialStateProperty.all(Colors.black12),
+                                    MaterialStateProperty.all(const Color(0xff235d8c)),
                                 shape: MaterialStateProperty.all<
                                     RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    side: BorderSide(color: Colors.black),
+                                    side: const BorderSide(color: Colors.black),
                                   ),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Вопрос взят',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -300,7 +301,7 @@ class _TrainingState extends State<Training> {
           );
         },
         loadingBuilder: () {
-          return SafeArea(
+          return const SafeArea(
             child: Center(
               child: CircularProgressIndicator(
                 color: Colors.white60,
@@ -315,10 +316,14 @@ class _TrainingState extends State<Training> {
               children: [
                 const Text('Ошибка, перезагрузите страницу'),
                 ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(const Color(0xff418ecd)),
+                    shadowColor: MaterialStateProperty.all(const Color(0xff418ecd)),
+                  ),
                   onPressed: () {
                     updateScreen();
                   },
-                  child: Text('Обновить'),
+                  child: const Text('Обновить', style: TextStyle(color: Colors.black)),
                 ),
               ],
             ),
