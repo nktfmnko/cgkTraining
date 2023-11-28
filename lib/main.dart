@@ -4,8 +4,6 @@ import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'statistics.dart';
-import 'package:cgk/profile.dart';
-
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -27,7 +25,7 @@ class MyApp extends StatelessWidget {
           '/': (context) => const Training(),
           '/statistic': (context) => const stat(),
           '/timer': (context) => const StateTimerPage(),
-          '/profile': (context) =>  profil()
+          '/profile': (context) =>  profile()
         });
   }
 }
