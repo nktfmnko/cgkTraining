@@ -78,6 +78,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
+          appBar: AppBar(backgroundColor: const Color(0xff418ecd),),
           backgroundColor: const Color(0xff3987c8),
           body: Center(
             child: Column(
@@ -94,7 +95,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                         value: _percent,
                         backgroundColor: Colors.red,
                         strokeWidth: 11,
-                        color: const Color(0xff418ecd),
+                        color: const Color(0xff235d8c),
                       ),
                     ),
                     Positioned(
@@ -121,7 +122,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                           onPressed: (){
                             isStart ? pause() : start(context);
                           },
-                          child: isStart ? const Icon(Icons.pause, size: 80,) : const Icon(Icons.play_arrow_outlined, size: 80,)),
+                          child: isStart ? const Icon(Icons.pause, size: 80, color: Color(0xff235d8c),) : const Icon(Icons.play_arrow_outlined, size: 80, color: Color(0xff235d8c),)),
                     ),
                     Container(
                       height: size.height * 0.15,
@@ -132,7 +133,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                           onPressed: (){
                             restart();
                           },
-                          child: const Icon(Icons.restart_alt, size: 80,)),
+                          child: const Icon(Icons.restart_alt, size: 80, color: Color(0xff235d8c),)),
                     ),
                   ],
                 ),
