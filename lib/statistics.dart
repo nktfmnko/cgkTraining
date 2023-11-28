@@ -29,14 +29,14 @@ class stat extends StatelessWidget {
             ),
             const SizedBox(height: 25),
             CircularPercentIndicator(
-              radius: 85.0,
+              radius: 105.0,
               lineWidth: 20.0,
               animation: true,
               animationDuration: 1000,
-              percent: 0.7,
+              percent: vzq / alq,
               center: Text(
                 '${(vzq / alq * 100).round()}%',
-                style: const TextStyle(fontSize: 30),
+                style: const TextStyle(fontSize: 40),
               ),
               circularStrokeCap: CircularStrokeCap.round,
               progressColor: Colors.yellow,
