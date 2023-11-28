@@ -54,6 +54,7 @@ class profile extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,

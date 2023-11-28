@@ -39,7 +39,8 @@ class _StateTimerPageState extends State<StateTimerPage> {
         _waitTime -= 1;
         _calculateTime();
         if (_waitTime <= 0) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Finished')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Finished')));
           pause();
         }
       });
@@ -73,71 +74,85 @@ class _StateTimerPageState extends State<StateTimerPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(backgroundColor: const Color(0xff418ecd),),
-          backgroundColor: const Color(0xff3987c8),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xff418ecd),
+      ),
+      backgroundColor: const Color(0xff3987c8),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              alignment: Alignment.center,
               children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      height: size.height * 0.3,
-                      width: size.height * 0.3,
-                      margin: const EdgeInsets.all(10),
-                      child: CircularProgressIndicator(
-                        value: _percent,
-                        backgroundColor: Colors.red,
-                        strokeWidth: 11,
-                        color: const Color(0xff235d8c),
-                      ),
-                    ),
-                    Positioned(
-                      child: Text(
-                        timeStr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 50,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
+                Container(
+                  height: size.height * 0.3,
+                  width: size.height * 0.3,
+                  margin: const EdgeInsets.all(10),
+                  child: CircularProgressIndicator(
+                    value: _percent,
+                    backgroundColor: Colors.red,
+                    strokeWidth: 11,
+                    color: const Color(0xff235d8c),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: size.height * 0.15,
-                      width: size.height * 0.15,
-                      margin: const EdgeInsets.all(20),
-                      child: FloatingActionButton(
-                          backgroundColor: const Color(0xff418ecd),
-                          onPressed: (){
-                            isStart ? pause() : start(context);
-                          },
-                          child: isStart ? const Icon(Icons.pause, size: 80, color: Color(0xff235d8c),) : const Icon(Icons.play_arrow_outlined, size: 80, color: Color(0xff235d8c),)),
+                Positioned(
+                  child: Text(
+                    timeStr,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50,
                     ),
-                    Container(
-                      height: size.height * 0.15,
-                      width: size.height * 0.15,
-                      margin: const EdgeInsets.all(20),
-                      child: FloatingActionButton(
-                        backgroundColor: const Color(0xff418ecd),
-                          onPressed: (){
-                            restart();
-                          },
-                          child: const Icon(Icons.restart_alt, size: 80, color: Color(0xff235d8c),)),
-                    ),
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
-          ),
-        )
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: size.height * 0.15,
+                  width: size.height * 0.15,
+                  margin: const EdgeInsets.all(20),
+                  child: FloatingActionButton(
+                      backgroundColor: const Color(0xff418ecd),
+                      onPressed: () {
+                        isStart ? pause() : start(context);
+                      },
+                      child: isStart
+                          ? const Icon(
+                              Icons.pause,
+                              size: 80,
+                              color: Color(0xff235d8c),
+                            )
+                          : const Icon(
+                              Icons.play_arrow_outlined,
+                              size: 80,
+                              color: Color(0xff235d8c),
+                            )),
+                ),
+                Container(
+                  height: size.height * 0.15,
+                  width: size.height * 0.15,
+                  margin: const EdgeInsets.all(20),
+                  child: FloatingActionButton(
+                      backgroundColor: const Color(0xff418ecd),
+                      onPressed: () {
+                        restart();
+                      },
+                      child: const Icon(
+                        Icons.restart_alt,
+                        size: 80,
+                        color: Color(0xff235d8c),
+                      )),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
