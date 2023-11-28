@@ -1,3 +1,4 @@
+import 'package:cgk/navigation.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +98,7 @@ class _TrainingState extends State<Training> {
       appBar: AppBar(
         backgroundColor: const Color(0xff418ecd),
       ),
+      drawer: const Navigation(),
       body: ValueUnionStateListener<List<QA>>(
         unionListenable: qaState,
         contentBuilder: (content) {
