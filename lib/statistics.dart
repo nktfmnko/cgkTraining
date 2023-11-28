@@ -1,14 +1,14 @@
+import 'package:cgk/qa.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-
-var alq = 23; //Общее кол-во вопросов
-var vzq = 18; //Кол-во взятых вопросов
 
 class stat extends StatelessWidget {
   const stat({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var alq = moved.length + 1; //Общее кол-во вопросов
+    var vzq = answered.length; //Кол-во взятых вопросов
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(

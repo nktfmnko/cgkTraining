@@ -45,11 +45,12 @@ class Training extends StatefulWidget {
   State<Training> createState() => _TrainingState();
 }
 
+final answered = <int>[];
+final moved = <int>{};
+
 class _TrainingState extends State<Training> {
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
-  final answered = <int>[];
   int questionIndex = 0;
-  final moved = <int>{};
 
   //чтение данных из бд
   Future<List<QA>> readData() async {
