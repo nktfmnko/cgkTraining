@@ -16,10 +16,19 @@ class Navigation extends StatelessWidget {
           padding: const EdgeInsets.only(left:15, top: 50), 
           child: Column(
             children: [
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text("профиль"),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed('/profile');
+                },
+              ),
                ListTile(
                 leading: const Icon(Icons.data_saver_off),
                 title: const Text("статистика"),
                 onTap: () {
+                  Navigator.of(context).pop();
                   Navigator.of(context).pushNamed('/statistic');
                 },
               ),
@@ -27,6 +36,7 @@ class Navigation extends StatelessWidget {
                 leading: const Icon(Icons.timer), 
                 title: const Text("таймер"),
                 onTap: () {
+                  Navigator.of(context).pop();
                   Navigator.of(context).pushNamed('/timer');
                 },
                 )
