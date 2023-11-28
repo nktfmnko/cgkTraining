@@ -1,3 +1,4 @@
+import 'package:cgk/profile.dart';
 import 'package:cgk/qa.dart';
 import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
