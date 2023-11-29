@@ -8,7 +8,7 @@ class Navigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Color(0xff235d8c),
+      backgroundColor: const Color(0xff2B71AB),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -24,10 +24,10 @@ class Navigation extends StatelessWidget {
                       Navigator.of(context).pop();
                       Navigator.of(context).pushNamed('/profile');
                     },
-
                   ),
                   ListTile(
-                    leading: const Icon(Icons.data_saver_off, color: Colors.black),
+                    leading:
+                        const Icon(Icons.data_saver_off, color: Colors.black),
                     title: const Text("Статистика"),
                     onTap: () {
                       Navigator.of(context).pop();

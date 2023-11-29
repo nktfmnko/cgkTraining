@@ -22,7 +22,7 @@ Padding getTextField(IconData iccon, txtxt, height_sc, context) {
               Radius.circular(20.0),
             ),
             borderSide: BorderSide(
-              color: Color(0xff5c85ff),
+              color: Colors.black38,
             ),
           ),
           focusedBorder: const OutlineInputBorder(
@@ -61,7 +61,8 @@ class profile extends StatelessWidget {
                 children: <Widget>[
                   Text('Профиль',
                       style: TextStyle(
-                          fontSize: 30, decoration: TextDecoration.underline),
+                        fontSize: 30,
+                      ),
                       textAlign: TextAlign.center),
                 ],
               ),

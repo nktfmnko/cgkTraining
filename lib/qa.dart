@@ -2,6 +2,7 @@ import 'package:cgk/navigation.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 //парсинг к нужному типу
@@ -47,6 +48,11 @@ class Training extends StatefulWidget {
 
 final answered = <int>[];
 final moved = <int>{};
+
+Future hidebar() async {
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top]);
+}
 
 class _TrainingState extends State<Training> {
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
@@ -94,6 +100,7 @@ class _TrainingState extends State<Training> {
 
   @override
   Widget build(BuildContext context) {
+    hidebar();
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(
@@ -258,47 +265,51 @@ class _TrainingState extends State<Training> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SizedBox(
-                            width: 250,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: answered
-                                      .contains(content[questionIndex].id)
-                                  ? null
-                                  : () {
-                                      answered.add(content[questionIndex].id);
-                                      setState(
-                                        () {},
-                                      );
-                                    },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    answered.contains(content[questionIndex].id)
-                                        ? MaterialStateProperty.all(
-                                            const Color(0xff235d8c))
-                                        : MaterialStateProperty.all(
-                                            const Color(0xff418ecd)),
-                                shadowColor:
-                                    answered.contains(content[questionIndex].id)
-                                        ? MaterialStateProperty.all(
-                                            const Color(0xff235d8c))
-                                        : MaterialStateProperty.all(
-                                            const Color(0xff418ecd)),
-                                overlayColor: MaterialStateProperty.all(
-                                    const Color(0xff235d8c)),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    side: const BorderSide(color: Colors.black),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: SizedBox(
+                              width: 250,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: answered
+                                        .contains(content[questionIndex].id)
+                                    ? null
+                                    : () {
+                                        answered.add(content[questionIndex].id);
+                                        setState(
+                                          () {},
+                                        );
+                                      },
+                                style: ButtonStyle(
+                                  backgroundColor: answered
+                                          .contains(content[questionIndex].id)
+                                      ? MaterialStateProperty.all(
+                                          const Color(0xff235d8c))
+                                      : MaterialStateProperty.all(
+                                          const Color(0xff418ecd)),
+                                  shadowColor: answered
+                                          .contains(content[questionIndex].id)
+                                      ? MaterialStateProperty.all(
+                                          const Color(0xff235d8c))
+                                      : MaterialStateProperty.all(
+                                          const Color(0xff418ecd)),
+                                  overlayColor: MaterialStateProperty.all(
+                                      const Color(0xff235d8c)),
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side:
+                                          const BorderSide(color: Colors.black),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Вопрос взят',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
+                                child: const Text(
+                                  'Вопрос взят',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ),
                             ),
