@@ -266,7 +266,7 @@ class _TrainingState extends State<Training> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.only(bottom: 22),
                             child: SizedBox(
                               width: 250,
                               height: 50,
