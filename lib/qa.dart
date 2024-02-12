@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cgk/navigation.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
@@ -48,15 +49,85 @@ class Training extends StatefulWidget {
 
 final answered = <int>[];
 final moved = <int>{};
+int questionIndex = 0;
 
-Future hidebar() async {
+Future hideBar() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top]);
 }
 
+String twoDigits(int n) {
+  return n.toString().padLeft(2, '0');
+}
+
+class QuestionTimer extends StatefulWidget {
+  final VoidCallback notifyParent;
+  final List<QA> questions;
+
+  QuestionTimer({Key? key, required this.notifyParent, required this.questions})
+      : super(key: key);
+
+  @override
+  State<QuestionTimer> createState() => _QuestionTimerState();
+}
+
+class _QuestionTimerState extends State<QuestionTimer> {
+  Duration duration = Duration(seconds: 10);
+  static const contDownDuration = Duration(seconds: 10);
+  Timer? timer;
+  int last = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void addTime() {
+    final addSeconds = -1;
+    final seconds = duration.inSeconds + addSeconds;
+    if (seconds < 0) {
+      timer?.cancel();
+      last++;
+      if (questionIndex < widget.questions.length - 1) {
+        questionIndex++;
+        moved.add(widget.questions[questionIndex].id);
+      }
+      widget.notifyParent();
+      reset();
+    } else {
+      duration = Duration(seconds: seconds);
+    }
+    setState(() {});
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void reset() {
+    duration = contDownDuration;
+    if (last != widget.questions.length + 1) {
+      startTimer();
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          '${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}',
+          style: TextStyle(fontSize: 80),
+        ),
+      ),
+    );
+  }
+}
+
 class _TrainingState extends State<Training> {
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
-  int questionIndex = 0;
 
   //чтение данных из бд
   Future<List<QA>> readData() async {
@@ -89,6 +160,7 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     updateScreen();
+    hideBar();
     super.initState();
   }
 
@@ -98,9 +170,12 @@ class _TrainingState extends State<Training> {
     super.dispose();
   }
 
+  void refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    hidebar();
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(
@@ -129,7 +204,10 @@ class _TrainingState extends State<Training> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const SizedBox(height: 130),
+              SizedBox(
+                height: 130,
+                child: QuestionTimer(notifyParent: refresh, questions: content),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
