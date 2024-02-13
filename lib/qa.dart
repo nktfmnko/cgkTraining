@@ -40,6 +40,10 @@ class QA {
   int get hashCode => id.hashCode ^ question.hashCode ^ answer.hashCode;
 }
 
+bool timeGame = true;
+
+GlobalKey<_QuestionTimerState> globalKey = GlobalKey();
+
 class Training extends StatefulWidget {
   const Training({super.key});
 
@@ -116,6 +120,7 @@ class _QuestionTimerState extends State<QuestionTimer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff3987c8),
       body: Center(
         child: Text(
           '${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}',
@@ -206,89 +211,103 @@ class _TrainingState extends State<Training> {
             children: [
               SizedBox(
                 height: 130,
-                child: QuestionTimer(notifyParent: refresh, questions: content),
+                child: timeGame
+                    ? QuestionTimer(
+                        notifyParent: refresh,
+                        questions: content,
+                        key: globalKey)
+                    : SizedBox.shrink(),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      if (questionIndex != 0) {
-                        questionIndex--;
-                      } else {
-                        return;
-                      }
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    iconSize: 50,
-                    color: Colors.black45,
-                  ),
+                  timeGame
+                      ? SizedBox(
+                          width: 60,
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            if (questionIndex != 0) {
+                              questionIndex--;
+                            } else {
+                              return;
+                            }
+                            setState(() {});
+                          },
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                          iconSize: 50,
+                          color: Colors.black45,
+                        ),
                   Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 300,
-                        width: 220,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                            color: const Color(0xbf418ecd),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(20),
-                            ),
+                    flex: 1,
+                    child: SizedBox(
+                      height: 300,
+                      width: 220,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          color: const Color(0xbf418ecd),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
                           ),
-                          child: InkWell(
-                            highlightColor: Colors.black38,
-                            splashColor: Colors.black26,
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(20),
-                            ),
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext builder) {
-                                  return AlertDialog(
-                                    contentPadding: const EdgeInsets.all(24),
-                                    content: Text(
-                                      content[questionIndex].question,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    backgroundColor: Colors.blueGrey,
-                                  );
-                                },
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SingleChildScrollView(
-                                key: ValueKey(questionIndex),
-                                scrollDirection: Axis.vertical,
-                                child: Text(
-                                  content[questionIndex].question,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                        ),
+                        child: InkWell(
+                          highlightColor: Colors.black38,
+                          splashColor: Colors.black26,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext builder) {
+                                return AlertDialog(
+                                  contentPadding: const EdgeInsets.all(24),
+                                  content: Text(
+                                    content[questionIndex].question,
+                                    textAlign: TextAlign.center,
                                   ),
+                                  backgroundColor: Colors.blueGrey,
+                                );
+                              },
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SingleChildScrollView(
+                              key: ValueKey(questionIndex),
+                              scrollDirection: Axis.vertical,
+                              child: Text(
+                                content[questionIndex].question,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      )),
-                  IconButton(
-                    iconSize: 50,
-                    onPressed: () {
-                      if (questionIndex < content.length - 1) {
-                        questionIndex++;
-                      } else {
-                        return;
-                      }
-                      moved.add(content[questionIndex].id);
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.arrow_forward_ios_rounded),
-                    color: Colors.black45,
-                  )
+                      ),
+                    ),
+                  ),
+                  timeGame
+                      ? SizedBox(
+                          width: 60,
+                        )
+                      : IconButton(
+                          iconSize: 50,
+                          onPressed: () {
+                            if (questionIndex < content.length - 1) {
+                              questionIndex++;
+                            } else {
+                              return;
+                            }
+                            moved.add(content[questionIndex].id);
+                            setState(() {});
+                          },
+                          icon: const Icon(Icons.arrow_forward_ios_rounded),
+                          color: Colors.black45,
+                        )
                 ],
               ),
               Center(
@@ -349,15 +368,36 @@ class _TrainingState extends State<Training> {
                               width: 250,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: answered
-                                        .contains(content[questionIndex].id)
-                                    ? null
-                                    : () {
-                                        answered.add(content[questionIndex].id);
-                                        setState(
-                                          () {},
-                                        );
-                                      },
+                                onPressed: timeGame
+                                    ? () {
+                                        if (questionIndex !=
+                                            content.length - 1) {
+                                          answered.contains(
+                                                  content[questionIndex].id)
+                                              ? null
+                                              : answered.add(
+                                                  content[questionIndex].id);
+                                          moved.add(content[questionIndex].id);
+                                          questionIndex++;
+                                          globalKey.currentState?.timer
+                                              ?.cancel();
+                                          globalKey.currentState?.reset();
+                                          setState(() {});
+                                        } else {
+                                          globalKey.currentState?.timer
+                                              ?.cancel();
+                                        }
+                                      }
+                                    : answered
+                                            .contains(content[questionIndex].id)
+                                        ? null
+                                        : () {
+                                            answered
+                                                .add(content[questionIndex].id);
+                                            setState(
+                                              () {},
+                                            );
+                                          },
                                 style: ButtonStyle(
                                   backgroundColor: answered
                                           .contains(content[questionIndex].id)
