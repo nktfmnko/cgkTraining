@@ -1,5 +1,5 @@
 import 'package:cgk/profile.dart';
-import 'package:cgk/qa.dart';
+import 'package:cgk/select_questions.dart';
 import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(routes: {
-      '/': (context) => const Training(),
+      '/': (context) => const SelectQuestion(),
       '/statistic': (context) => const stat(),
       '/timer': (context) => const StateTimerPage(),
       '/profile': (context) => profile()

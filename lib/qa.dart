@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cgk/navigation.dart';
+import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class QA {
   int get hashCode => id.hashCode ^ question.hashCode ^ answer.hashCode;
 }
 
-bool timeGame = true;
+bool timeGame = false;
 
 GlobalKey<_QuestionTimerState> globalKey = GlobalKey();
 
@@ -54,6 +55,7 @@ class Training extends StatefulWidget {
 final answered = <int>[];
 final moved = <int>{};
 int questionIndex = 0;
+int last = 1;
 
 Future hideBar() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -76,10 +78,9 @@ class QuestionTimer extends StatefulWidget {
 }
 
 class _QuestionTimerState extends State<QuestionTimer> {
-  Duration duration = Duration(seconds: 10);
-  static const contDownDuration = Duration(seconds: 10);
+  Duration duration = Duration(seconds: 2);
+  static const contDownDuration = Duration(seconds: 2);
   Timer? timer;
-  int last = 1;
 
   @override
   void initState() {
@@ -156,7 +157,8 @@ class _TrainingState extends State<Training> {
     try {
       qaState.value = UnionState$Loading();
       final data = await readData();
-      qaState.value = UnionState$Content(data);
+      data.shuffle();
+      qaState.value = UnionState$Content(data.take(selected.toInt()).toList());
     } on Exception {
       qaState.value = UnionState$Error();
     }
@@ -209,15 +211,17 @@ class _TrainingState extends State<Training> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              SizedBox(
-                height: 130,
-                child: timeGame
-                    ? QuestionTimer(
-                        notifyParent: refresh,
-                        questions: content,
-                        key: globalKey)
-                    : SizedBox.shrink(),
-              ),
+              last == content.length + 1
+                  ? SizedBox.shrink()
+                  : SizedBox(
+                      height: 130,
+                      child: timeGame
+                          ? QuestionTimer(
+                              notifyParent: refresh,
+                              questions: content,
+                              key: globalKey)
+                          : SizedBox.shrink(),
+                    ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -238,58 +242,113 @@ class _TrainingState extends State<Training> {
                           iconSize: 50,
                           color: Colors.black45,
                         ),
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 300,
-                      width: 220,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: const Color(0xbf418ecd),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(20),
+                  last == content.length + 1
+                      ? DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.black38,
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20),
+                            ),
                           ),
-                        ),
-                        child: InkWell(
-                          highlightColor: Colors.black38,
-                          splashColor: Colors.black26,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(20),
+                          child: SizedBox(
+                            height: 360,
+                            width: 270,
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 5),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Всего вопросов: ${timeGame ? content.length : moved.length}',
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Вопросов взято: ${answered.length}',
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        last = 1;
+                                        questionIndex = 0;
+                                        selected = 1;
+                                        timeGame = false;
+                                        moved.clear();
+                                        answered.clear();
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SelectQuestion(),
+                                            ),
+                                            (route) => false);
+                                      },
+                                      child: Text('Домой'),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                          onLongPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext builder) {
-                                return AlertDialog(
-                                  contentPadding: const EdgeInsets.all(24),
-                                  content: Text(
-                                    content[questionIndex].question,
-                                    textAlign: TextAlign.center,
+                        )
+                      : Expanded(
+                          flex: 1,
+                          child: SizedBox(
+                            height: 300,
+                            width: 220,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black),
+                                color: const Color(0xbf418ecd),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                              child: InkWell(
+                                highlightColor: Colors.black38,
+                                splashColor: Colors.black26,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext builder) {
+                                      return AlertDialog(
+                                        contentPadding:
+                                            const EdgeInsets.all(24),
+                                        content: Text(
+                                          content[questionIndex].question,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        backgroundColor: Colors.blueGrey,
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SingleChildScrollView(
+                                    key: ValueKey(questionIndex),
+                                    scrollDirection: Axis.vertical,
+                                    child: Text(
+                                      content[questionIndex].question,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
                                   ),
-                                  backgroundColor: Colors.blueGrey,
-                                );
-                              },
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SingleChildScrollView(
-                              key: ValueKey(questionIndex),
-                              scrollDirection: Axis.vertical,
-                              child: Text(
-                                content[questionIndex].question,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 18,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
                   timeGame
                       ? SizedBox(
                           width: 60,
@@ -311,131 +370,149 @@ class _TrainingState extends State<Training> {
                 ],
               ),
               Center(
-                child: SizedBox(
-                  width: 100,
-                  height: 40,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(const Color(0xff418ecd)),
-                      shadowColor:
-                          MaterialStateProperty.all(const Color(0xff418ecd)),
-                      overlayColor: MaterialStateProperty.all(Colors.black12),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: Colors.black),
+                child: last == content.length + 1
+                    ? SizedBox.shrink()
+                    : SizedBox(
+                        width: 100,
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color(0xff418ecd)),
+                            shadowColor: MaterialStateProperty.all(
+                                const Color(0xff418ecd)),
+                            overlayColor:
+                                MaterialStateProperty.all(Colors.black12),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  contentPadding: const EdgeInsets.all(24),
+                                  content: Text(
+                                    content[questionIndex].answer,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  backgroundColor: Colors.blueGrey,
+                                );
+                              },
+                            );
+                          },
+                          child: const Text(
+                            'Ответ',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            contentPadding: const EdgeInsets.all(24),
-                            content: Text(
-                              content[questionIndex].answer,
-                              textAlign: TextAlign.center,
-                            ),
-                            backgroundColor: Colors.blueGrey,
-                          );
-                        },
-                      );
-                    },
-                    child: const Text(
-                      'Ответ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
               ),
               Row(
                 children: [
-                  Container(
-                    height: 210,
-                    width: MediaQuery.of(context).size.width,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: SizedBox(
-                              width: 250,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: timeGame
-                                    ? () {
-                                        if (questionIndex !=
-                                            content.length - 1) {
-                                          answered.contains(
+                  last == content.length + 1
+                      ? SizedBox.shrink()
+                      : Container(
+                          height: 210,
+                          width: MediaQuery.of(context).size.width,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: SizedBox(
+                                    width: 250,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed: timeGame
+                                          ? () {
+                                              if (questionIndex !=
+                                                  content.length - 1) {
+                                                answered.contains(
+                                                        content[questionIndex]
+                                                            .id)
+                                                    ? null
+                                                    : answered.add(
+                                                        content[questionIndex]
+                                                            .id);
+                                                moved.add(
+                                                    content[questionIndex].id);
+                                                questionIndex++;
+                                                last++;
+                                                globalKey.currentState?.timer
+                                                    ?.cancel();
+                                                globalKey.currentState?.reset();
+                                                setState(() {});
+                                              } else {
+                                                answered.add(
+                                                    content[questionIndex].id);
+                                                globalKey.currentState?.timer
+                                                    ?.cancel();
+                                                last++;
+                                                setState(
+                                                  () {},
+                                                );
+                                              }
+                                            }
+                                          : answered.contains(
                                                   content[questionIndex].id)
                                               ? null
-                                              : answered.add(
-                                                  content[questionIndex].id);
-                                          moved.add(content[questionIndex].id);
-                                          questionIndex++;
-                                          globalKey.currentState?.timer
-                                              ?.cancel();
-                                          globalKey.currentState?.reset();
-                                          setState(() {});
-                                        } else {
-                                          globalKey.currentState?.timer
-                                              ?.cancel();
-                                        }
-                                      }
-                                    : answered
-                                            .contains(content[questionIndex].id)
-                                        ? null
-                                        : () {
-                                            answered
-                                                .add(content[questionIndex].id);
-                                            setState(
-                                              () {},
-                                            );
-                                          },
-                                style: ButtonStyle(
-                                  backgroundColor: answered
-                                          .contains(content[questionIndex].id)
-                                      ? MaterialStateProperty.all(
-                                          const Color(0xff235d8c))
-                                      : MaterialStateProperty.all(
-                                          const Color(0xff418ecd)),
-                                  shadowColor: answered
-                                          .contains(content[questionIndex].id)
-                                      ? MaterialStateProperty.all(
-                                          const Color(0xff235d8c))
-                                      : MaterialStateProperty.all(
-                                          const Color(0xff418ecd)),
-                                  overlayColor: MaterialStateProperty.all(
-                                      const Color(0xff235d8c)),
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side:
-                                          const BorderSide(color: Colors.black),
+                                              : () {
+                                                  answered.add(
+                                                      content[questionIndex]
+                                                          .id);
+                                                  setState(
+                                                    () {},
+                                                  );
+                                                },
+                                      style: ButtonStyle(
+                                        backgroundColor: answered.contains(
+                                                content[questionIndex].id)
+                                            ? MaterialStateProperty.all(
+                                                const Color(0xff235d8c))
+                                            : MaterialStateProperty.all(
+                                                const Color(0xff418ecd)),
+                                        shadowColor: answered.contains(
+                                                content[questionIndex].id)
+                                            ? MaterialStateProperty.all(
+                                                const Color(0xff235d8c))
+                                            : MaterialStateProperty.all(
+                                                const Color(0xff418ecd)),
+                                        overlayColor: MaterialStateProperty.all(
+                                            const Color(0xff235d8c)),
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            side: const BorderSide(
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Вопрос взят',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: const Text(
-                                  'Вопрос взят',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
+                          ),
+                        )
                 ],
               ),
             ],

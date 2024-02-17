@@ -56,9 +56,11 @@ class _StateTimerPageState extends State<StateTimerPage> {
   // Функция кнопки Паузы
   void pause() {
     _timer?.cancel();
-    setState(() {
-      isStart = false;
-    });
+    setState(
+      () {
+        isStart = false;
+      },
+    );
   }
 
   // Дополнительная функция для вычисления времени
