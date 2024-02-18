@@ -6,6 +6,7 @@ import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vibration/vibration.dart';
 
 //парсинг к нужному типу
 extension TypeCast<T> on T? {
@@ -56,6 +57,7 @@ final answered = <int>[];
 final moved = <int>{};
 int questionIndex = 0;
 int last = 1;
+double time = 0;
 
 Future hideBar() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -78,9 +80,10 @@ class QuestionTimer extends StatefulWidget {
 }
 
 class _QuestionTimerState extends State<QuestionTimer> {
-  Duration duration = Duration(seconds: 2);
-  static const contDownDuration = Duration(seconds: 2);
+  Duration duration = Duration(seconds: 10);
+  Duration contDownDuration = Duration(seconds: 10);
   Timer? timer;
+
 
   @override
   void initState() {
@@ -91,9 +94,13 @@ class _QuestionTimerState extends State<QuestionTimer> {
   void addTime() {
     final addSeconds = -1;
     final seconds = duration.inSeconds + addSeconds;
+    if(seconds == 3){
+      Vibration.vibrate(duration: 700, amplitude: 128);
+    }
     if (seconds < 0) {
       timer?.cancel();
       last++;
+      time += contDownDuration.inSeconds;
       if (questionIndex < widget.questions.length - 1) {
         questionIndex++;
         moved.add(widget.questions[questionIndex].id);
@@ -225,27 +232,32 @@ class _TrainingState extends State<Training> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  timeGame
+                  timeGame || last == content.length + 1
                       ? SizedBox(
                           width: 60,
                         )
-                      : IconButton(
-                          onPressed: () {
-                            if (questionIndex != 0) {
-                              questionIndex--;
-                            } else {
-                              return;
-                            }
-                            setState(() {});
-                          },
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                          iconSize: 50,
-                          color: Colors.black45,
-                        ),
+                      : (questionIndex == 0
+                          ? SizedBox(
+                              width: 66,
+                            )
+                          : IconButton(
+                              onPressed: () {
+                                if (questionIndex != 0) {
+                                  questionIndex--;
+                                } else {
+                                  return;
+                                }
+                                setState(() {});
+                              },
+                              icon:
+                                  const Icon(Icons.arrow_back_ios_new_rounded),
+                              iconSize: 50,
+                              color: Colors.black45,
+                            )),
                   last == content.length + 1
                       ? DecoratedBox(
                           decoration: BoxDecoration(
-                            color: Colors.black38,
+                            color: Colors.black26,
                             border: Border.all(color: Colors.black),
                             borderRadius: BorderRadius.all(
                               Radius.circular(20),
@@ -261,7 +273,7 @@ class _TrainingState extends State<Training> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      'Всего вопросов: ${timeGame ? content.length : moved.length}',
+                                      'Всего вопросов: ${content.length}',
                                       style: TextStyle(
                                         fontSize: 25,
                                       ),
@@ -272,13 +284,39 @@ class _TrainingState extends State<Training> {
                                         fontSize: 25,
                                       ),
                                     ),
+                                    timeGame
+                                        ? Text(
+                                            'Общее время: ${time}с',
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                            ),
+                                          )
+                                        : SizedBox.shrink(),
                                     ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                const Color(0xff418ecd)),
+                                        shadowColor: MaterialStateProperty.all(
+                                            const Color(0xff418ecd)),
+                                        overlayColor: MaterialStateProperty.all(
+                                            Colors.black12),
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            side: const BorderSide(
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
                                       onPressed: () {
                                         last = 1;
                                         questionIndex = 0;
                                         selected = 1;
-                                        timeGame = false;
                                         moved.clear();
+                                        time = 0;
                                         answered.clear();
                                         Navigator.pushAndRemoveUntil(
                                             context,
@@ -288,7 +326,10 @@ class _TrainingState extends State<Training> {
                                             ),
                                             (route) => false);
                                       },
-                                      child: Text('Домой'),
+                                      child: Text(
+                                        'Домой',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -349,24 +390,28 @@ class _TrainingState extends State<Training> {
                             ),
                           ),
                         ),
-                  timeGame
+                  timeGame || last == content.length + 1
                       ? SizedBox(
                           width: 60,
                         )
-                      : IconButton(
-                          iconSize: 50,
-                          onPressed: () {
-                            if (questionIndex < content.length - 1) {
-                              questionIndex++;
-                            } else {
-                              return;
-                            }
-                            moved.add(content[questionIndex].id);
-                            setState(() {});
-                          },
-                          icon: const Icon(Icons.arrow_forward_ios_rounded),
-                          color: Colors.black45,
-                        )
+                      : (questionIndex == content.length - 1
+                          ? SizedBox(
+                              width: 66,
+                            )
+                          : IconButton(
+                              iconSize: 50,
+                              onPressed: () {
+                                if (questionIndex < content.length - 1) {
+                                  questionIndex++;
+                                } else {
+                                  return;
+                                }
+                                moved.add(content[questionIndex].id);
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.arrow_forward_ios_rounded),
+                              color: Colors.black45,
+                            ))
                 ],
               ),
               Center(
@@ -435,6 +480,7 @@ class _TrainingState extends State<Training> {
                                     child: ElevatedButton(
                                       onPressed: timeGame
                                           ? () {
+                                              print(time);
                                               if (questionIndex !=
                                                   content.length - 1) {
                                                 answered.contains(
@@ -448,6 +494,12 @@ class _TrainingState extends State<Training> {
                                                     content[questionIndex].id);
                                                 questionIndex++;
                                                 last++;
+                                                time += globalKey
+                                                        .currentState!
+                                                        .contDownDuration
+                                                        .inSeconds -
+                                                    globalKey.currentState!
+                                                        .duration.inSeconds;
                                                 globalKey.currentState?.timer
                                                     ?.cancel();
                                                 globalKey.currentState?.reset();
@@ -458,6 +510,12 @@ class _TrainingState extends State<Training> {
                                                 globalKey.currentState?.timer
                                                     ?.cancel();
                                                 last++;
+                                                time += globalKey
+                                                        .currentState!
+                                                        .contDownDuration
+                                                        .inSeconds -
+                                                    globalKey.currentState!
+                                                        .duration.inSeconds;
                                                 setState(
                                                   () {},
                                                 );
@@ -470,6 +528,7 @@ class _TrainingState extends State<Training> {
                                                   answered.add(
                                                       content[questionIndex]
                                                           .id);
+                                                  last++;
                                                   setState(
                                                     () {},
                                                   );

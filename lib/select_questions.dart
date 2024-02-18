@@ -33,6 +33,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
               height: 20,
             ),
             Slider(
+              activeColor: Colors.black,
               value: selected,
               max: 10,
               min: 1,
@@ -56,6 +57,8 @@ class _SelectQuestionState extends State<SelectQuestion> {
                 Transform.scale(
                   scale: 1.2,
                   child: Checkbox(
+                    checkColor: Colors.black,
+                    activeColor: Colors.black26,
                     value: timeGame,
                     onChanged: (bool? value) {
                       setState(
@@ -71,20 +74,43 @@ class _SelectQuestionState extends State<SelectQuestion> {
             SizedBox(
               height: 10,
             ),
-            ElevatedButton(
-              style: ButtonStyle(
-
-              ),
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Training(),
+            SizedBox(
+              height: 45,
+              width: 120,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all(const Color(0xff418ecd)),
+                  shadowColor:
+                      MaterialStateProperty.all(const Color(0xff418ecd)),
+                  overlayColor: MaterialStateProperty.all(Colors.black12),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: const BorderSide(
+                        color: Colors.black,
+                        width: 1.5,
+                      ),
+                    ),
                   ),
-                  (route) => false,
-                );
-              },
-              child: Text("Начать"),
+                ),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Training(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                child: Text(
+                  "Начать",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
             )
           ],
         ),
