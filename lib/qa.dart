@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cgk/navigation.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
@@ -81,9 +82,8 @@ class QuestionTimer extends StatefulWidget {
 
 class _QuestionTimerState extends State<QuestionTimer> {
   Duration duration = Duration(seconds: 10);
-  Duration contDownDuration = Duration(seconds: 10);
+  Duration countDownDuration = Duration(seconds: 10);
   Timer? timer;
-
 
   @override
   void initState() {
@@ -94,13 +94,13 @@ class _QuestionTimerState extends State<QuestionTimer> {
   void addTime() {
     final addSeconds = -1;
     final seconds = duration.inSeconds + addSeconds;
-    if(seconds == 3){
+    if (seconds == 3) {
       Vibration.vibrate(duration: 700, amplitude: 128);
     }
     if (seconds < 0) {
       timer?.cancel();
       last++;
-      time += contDownDuration.inSeconds;
+      time += countDownDuration.inSeconds;
       if (questionIndex < widget.questions.length - 1) {
         questionIndex++;
         moved.add(widget.questions[questionIndex].id);
@@ -115,10 +115,11 @@ class _QuestionTimerState extends State<QuestionTimer> {
 
   void startTimer() {
     timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+    AudioPlayer().play(AssetSource('startTimer.mp3'));
   }
 
   void reset() {
-    duration = contDownDuration;
+    duration = countDownDuration;
     if (last != widget.questions.length + 1) {
       startTimer();
     }
@@ -192,10 +193,6 @@ class _TrainingState extends State<Training> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xff418ecd),
-      ),
-      drawer: const Navigation(),
       body: ValueUnionStateListener<List<QA>>(
         unionListenable: qaState,
         contentBuilder: (content) {
@@ -218,6 +215,93 @@ class _TrainingState extends State<Training> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              SizedBox(
+                height: 10,
+              ),
+              timeGame
+                  ? (last == content.length + 1
+                      ? SizedBox.shrink()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                globalKey.currentState!.timer?.cancel();
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      backgroundColor: Colors.blueGrey,
+                                      content: SizedBox(
+                                        height: 180,
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  globalKey.currentState!
+                                                      .startTimer();
+                                                  setState(() {});
+                                                },
+                                                child: Text(
+                                                  "Продолжить",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+                                              width: 170,
+                                              height: 50,
+                                            ),
+                                            SizedBox(
+                                              height: 30,
+                                            ),
+                                            SizedBox(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  last = 1;
+                                                  questionIndex = 0;
+                                                  selected = 1;
+                                                  moved.clear();
+                                                  time = 0;
+                                                  answered.clear();
+                                                  Navigator.pushAndRemoveUntil(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const SelectQuestion(),
+                                                      ),
+                                                      (route) => false);
+                                                },
+                                                child: Text(
+                                                  "Домой",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+                                              width: 170,
+                                              height: 50,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                Icons.pause,
+                                size: 70,
+                                color: Colors.black,
+                              ),
+                            )
+                          ],
+                        ))
+                  : SizedBox.shrink(),
               last == content.length + 1
                   ? SizedBox.shrink()
                   : SizedBox(
@@ -480,7 +564,6 @@ class _TrainingState extends State<Training> {
                                     child: ElevatedButton(
                                       onPressed: timeGame
                                           ? () {
-                                              print(time);
                                               if (questionIndex !=
                                                   content.length - 1) {
                                                 answered.contains(
@@ -496,7 +579,7 @@ class _TrainingState extends State<Training> {
                                                 last++;
                                                 time += globalKey
                                                         .currentState!
-                                                        .contDownDuration
+                                                        .countDownDuration
                                                         .inSeconds -
                                                     globalKey.currentState!
                                                         .duration.inSeconds;
@@ -512,7 +595,7 @@ class _TrainingState extends State<Training> {
                                                 last++;
                                                 time += globalKey
                                                         .currentState!
-                                                        .contDownDuration
+                                                        .countDownDuration
                                                         .inSeconds -
                                                     globalKey.currentState!
                                                         .duration.inSeconds;
@@ -529,6 +612,7 @@ class _TrainingState extends State<Training> {
                                                       content[questionIndex]
                                                           .id);
                                                   last++;
+                                                  questionIndex++;
                                                   setState(
                                                     () {},
                                                   );

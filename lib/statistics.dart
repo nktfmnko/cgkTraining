@@ -7,9 +7,8 @@ class stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var alq =
-        timeGame ? moved.length : moved.length + 1; //Общее кол-во вопросов
-    var vzq = answered.length; //Кол-во взятых вопросов
+    var alq = 12; //Общее кол-во вопросов
+    var vzq = 6; //Кол-во взятых вопросов
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(
