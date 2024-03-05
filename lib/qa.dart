@@ -60,10 +60,6 @@ int questionIndex = 0;
 int last = 1;
 double time = 0;
 
-Future hideBar() async {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top]);
-}
 
 String twoDigits(int n) {
   return n.toString().padLeft(2, '0');
@@ -175,7 +171,6 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     updateScreen();
-    hideBar();
     super.initState();
   }
 
@@ -611,8 +606,10 @@ class _TrainingState extends State<Training> {
                                                   answered.add(
                                                       content[questionIndex]
                                                           .id);
+                                                  if(questionIndex != content.length-1){
+                                                    questionIndex++;
+                                                  }
                                                   last++;
-                                                  questionIndex++;
                                                   setState(
                                                     () {},
                                                   );

@@ -11,11 +11,7 @@ class SelectQuestion extends StatefulWidget {
 }
 
 class _SelectQuestionState extends State<SelectQuestion> {
-  @override
-  void initState() {
-    hideBar();
-    super.initState();
-  }
+
 
   @override
   Widget build(BuildContext context) {
