@@ -1,32 +1,53 @@
+import 'dart:io';
+
 import 'package:cgk/login.dart';
+import 'package:cgk/union_state.dart';
+import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class User {
+  final int id;
   final String name;
   final String mail;
   final String password;
 
   const User({
+    required this.id,
     required this.name,
     required this.mail,
     required this.password,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          mail == other.mail &&
+          password == other.password;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ mail.hashCode ^ password.hashCode;
 }
 
 bool seePassword = true;
+bool isPress = false;
 List<User> users = <User>[];
 
-bool hasEmail(List<User> u, String s) {
+bool hasEmail(List<String> u, String s) {
   for (var value in u) {
-    if (value.mail == s) return true;
+    if (value == s) return true;
   }
   return false;
 }
 
 bool correctFields(String mail, String password, String user) {
-  return !hasEmail(users, mail) &&
-      !mail.isEmpty &&
+  return !mail.isEmpty &&
       !password.isEmpty &&
       !user.isEmpty &&
       EmailValidator.validate(mail) &&
@@ -51,6 +72,14 @@ String? validatePassword(String value) {
   }
 }
 
+extension TypeCast<T> on T? {
+  R safeCast<R>() {
+    final value = this;
+    if (value is R) return value;
+    throw Exception('не удалось привести тип $runtimeType к типу $R');
+  }
+}
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -59,9 +88,48 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final mailState =
+      ValueNotifier<UnionState<List<String>>>(UnionState$Loading());
+
   final nameController = TextEditingController();
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
+  final supabase = Supabase.instance.client;
+
+  Future<void> insertUser(User user) async {
+    await supabase.from('users').insert(
+        {'name': user.name, 'email': user.mail, 'password': user.password});
+  }
+
+  Future<List<String>> readMails() async {
+    final response =
+        await Supabase.instance.client.from('users').select('email');
+    if (response is! Object) throw Exception('результат равен null');
+    return response
+        .safeCast<List<Object?>>()
+        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map(
+          (e) => e['email'].safeCast<String>(),
+        )
+        .toList();
+  }
+
+  Future<void> updateButton() async {
+    try {
+      mailState.value = UnionState$Loading();
+      final data = await readMails();
+      data.shuffle();
+      mailState.value = UnionState$Content(data);
+    } on Exception {
+      mailState.value = UnionState$Error();
+    }
+  }
+
+  @override
+  void dispose() {
+    mailState.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,16 +170,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       TextFormField(
                         controller: mailController,
-                        onChanged: (String value) async {
-                          setState(() {});
-                        },
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (input) =>
                             EmailValidator.validate(mailController.text)
-                                ? (hasEmail(users, mailController.text)
-                                    ? 'Пользователь с такой почтой уже есть'
-                                    : null)
+                                ? null
                                 : 'Введите корректную почту',
+                        onChanged: (String value) async {
+                          setState(() {});
+                        },
                         decoration: InputDecoration(
                           label: Text('Почта'),
                           prefixIcon: Icon(Icons.email_outlined),
@@ -166,59 +232,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: correctFields(mailController.text,
-                                  passwordController.text, nameController.text)
-                              ? () {
-                                  hasEmail(users, mailController.text)
-                                      ? showDialog(
-                                          context: context,
-                                          builder: (BuildContext) {
-                                            return AlertDialog(
-                                              title: Text(
-                                                  'Пользователь с такой почтой уже есть'),
-                                            );
-                                          },
-                                        )
-                                      : users.add(
+                        child: !isPress
+                            ? ElevatedButton(
+                                onPressed: correctFields(
+                                        mailController.text,
+                                        passwordController.text,
+                                        nameController.text)
+                                    ? () {
+                                        isPress = !isPress;
+                                        updateButton();
+                                        setState(() {});
+                                      }
+                                    : null,
+                                child: Text('Зарегистрироваться'),
+                              )
+                            : ValueUnionStateListener<List<String>>(
+                                unionListenable: mailState,
+                                loadingBuilder: () {
+                                  return ElevatedButton(
+                                    onPressed: null,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                },
+                                contentBuilder: (content) {
+                                  hasEmail(content, mailController.text) ||
+                                          !correctFields(
+                                              mailController.text,
+                                              passwordController.text,
+                                              nameController.text)
+                                      ? null
+                                      : insertUser(
                                           new User(
+                                              id: 0,
                                               name: nameController.text,
                                               mail: mailController.text,
                                               password:
                                                   passwordController.text),
                                         );
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext) {
-                                      return AlertDialog(
-                                        title:
-                                            Text('Вы успешно зарегистрированы'),
-                                        content: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const LoginScreen(),
-                                                ),
-                                                (route) => false);
-                                          },
-                                          child: Text('Войти'),
-                                        ),
-                                      );
+                                  return ElevatedButton(
+                                    onPressed: () {
+                                      updateButton();
                                     },
+                                    child: Text(
+                                        'Пользователь с такой почтой уже есть'),
                                   );
-                                  setState(() {});
-                                }
-                              : null,
-                          child: Text('Зарегистрироваться'),
-                        ),
+                                },
+                                errorBuilder: () {
+                                  return ElevatedButton(
+                                    onPressed: () {
+                                      updateButton();
+                                    },
+                                    child: Text('Ошибка, обновите страницу'),
+                                  );
+                                },
+                              ),
                       )
                     ],
                   ),
                 ),
                 TextButton(
                   onPressed: () {
+                    isPress ? isPress = false : null;
                     Navigator.pop(context);
                   },
                   child: Text.rich(

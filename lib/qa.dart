@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:cgk/navigation.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vibration/vibration.dart';
 
