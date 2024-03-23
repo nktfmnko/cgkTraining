@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(routes: {
-      '/': (context) => const SelectQuestion(),
+      '/': (context) => const StateTimerPage(),
       '/statistic': (context) => const stat(),
       '/timer': (context) => const StateTimerPage(),
       '/profile': (context) => profile()

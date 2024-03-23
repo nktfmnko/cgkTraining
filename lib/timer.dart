@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class StateTimerPage extends StatefulWidget {
   const StateTimerPage({Key? key}) : super(key: key);
@@ -41,6 +42,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
         if (_waitTime <= 0) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text('Finished')));
+          AudioPlayer().play(AssetSource('startTimer.mp3'));
           pause();
         }
       });
@@ -77,9 +79,6 @@ class _StateTimerPageState extends State<StateTimerPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xff418ecd),
-      ),
       backgroundColor: const Color(0xff3987c8),
       body: Center(
         child: Column(
