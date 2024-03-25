@@ -10,9 +10,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 bool rightLogin(String mail, String password) {
-  for (var value in users) {
-    if (value.mail == mail) if (value.password == password) return true;
-  }
+
   return false;
 }
 

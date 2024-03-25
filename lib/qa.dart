@@ -161,8 +161,8 @@ class _TrainingState extends State<Training> {
       final data = await readData();
       data.shuffle();
       qaState.value = UnionState$Content(data.take(selected.toInt()).toList());
-    } on Exception {
-      qaState.value = UnionState$Error();
+    } on Exception catch (e) {
+      qaState.value = UnionState$Error(e);
     }
   }
 
@@ -665,7 +665,7 @@ class _TrainingState extends State<Training> {
             ),
           );
         },
-        errorBuilder: () {
+        errorBuilder: (_) {
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
