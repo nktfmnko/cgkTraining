@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cgk/login.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/select_questions.dart';
@@ -27,12 +25,12 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final registerState = UnionStateNotifier<void>(UnionState$Content(null));
   final obscureTextState = ValueNotifier<bool>(true);
-
+  final isPressState = ValueNotifier<bool>(false);
   final nameController = TextEditingController();
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
   final supabase = Supabase.instance.client;
-  
+
   bool correctFields(String mail, String password, String user) {
     return !mail.isEmpty &&
         !password.isEmpty &&
@@ -71,11 +69,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<List<String>> readMails() async {
     final response = await supabase.from('users').select('email');
-    return response
+    return TypeCast(response)
         .safeCast<List<Object?>>()
-        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
-          (e) => e['email'].safeCast<String>(),
+          (e) => TypeCast(e['email']).safeCast<String>(),
         )
         .toList();
   }
@@ -88,9 +86,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         registerState.error(MessageException('Поля неверно заполнены'));
         return;
       }
+      isPressState.value = !isPressState.value;
       final mailsList = await readMails();
       if (mailsList.contains(mailController.text)) {
-        registerState.error(MessageException('Пользователь с такой почтой уже существует'));
+        registerState.error(
+            MessageException('Пользователь с такой почтой уже существует'));
+        isPressState.value = !isPressState.value;
         return;
       }
 
@@ -98,6 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           name: nameController.text,
           email: mailController.text,
           password: passwordController.text);
+      userEmail = mailController.text;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const SelectQuestion()),
@@ -105,6 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
     } on Exception {
       registerState.error(MessageException('Произошла ошибка, повторите'));
+      isPressState.value = !isPressState.value;
     }
   }
 
@@ -118,6 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff4397de),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -125,23 +129,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 100,
+                  height: MediaQuery.of(context).size.height / 5,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
+                      cursorColor: Colors.white,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                       controller: nameController,
                       decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.person_outline_outlined,
+                          color: Colors.white,
+                        ),
                         label: Text('Имя Фамилия'),
-                        prefixIcon: Icon(Icons.person_outline_outlined),
-                        border: OutlineInputBorder(),
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: TextStyle(color: Colors.white),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                             width: 2,
                             color: Colors.black,
                           ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.5),
                         ),
                       ),
                     ),
@@ -149,6 +163,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 20,
                     ),
                     TextFormField(
+                      cursorColor: Colors.white,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                       controller: mailController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (input) =>
@@ -157,14 +175,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               : 'Введите корректную почту',
                       decoration: InputDecoration(
                         label: Text('Почта'),
-                        prefixIcon: Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(),
-                        labelStyle: TextStyle(color: Colors.black),
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: Colors.white,
+                        ),
+                        labelStyle: TextStyle(color: Colors.white),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(width: 1.5),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            width: 2,
+                            width: 1.5,
                             color: Colors.black,
                           ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.5),
                         ),
                       ),
                     ),
@@ -175,6 +202,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       valueListenable: obscureTextState,
                       builder: (_, obscureText, __) {
                         return TextFormField(
+                          cursorColor: Colors.white,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                           obscureText: obscureText,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (input) =>
@@ -182,21 +213,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           controller: passwordController,
                           decoration: InputDecoration(
                             label: Text('Пароль'),
-                            prefixIcon: Icon(Icons.password_outlined),
+                            prefixIcon: Icon(
+                              Icons.password_outlined,
+                              color: Colors.white,
+                            ),
                             border: OutlineInputBorder(),
-                            labelStyle: TextStyle(color: Colors.black),
+                            labelStyle: TextStyle(color: Colors.white),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                width: 2,
+                                width: 1.5,
                                 color: Colors.black,
                               ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.black, width: 1.5),
                             ),
                             suffixIcon: IconButton(
                               onPressed: () {
                                 obscureTextState.value =
                                     !obscureTextState.value;
                               },
-                              icon: Icon(Icons.remove_red_eye_sharp),
+                              icon: Icon(
+                                Icons.remove_red_eye_sharp,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         );
@@ -211,8 +252,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         unionListenable: registerState,
                         contentBuilder: (_) {
                           return ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStatePropertyAll<Color>(
+                                  Color(0xff1b588c)),
+                            ),
                             onPressed: authorize,
-                            child: Text('Зарегистрироваться'),
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: isPressState,
+                              builder: (_, isPress, __) {
+                                return isPress
+                                    ? CircularProgressIndicator(
+                                        color: Colors.black,
+                                      )
+                                    : Text(
+                                        'Зарегистрироваться',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 17),
+                                      );
+                              },
+                            ),
                           );
                         },
                         loadingBuilder: () {
@@ -225,8 +283,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                         errorBuilder: (exception) {
                           return ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStatePropertyAll<Color>(
+                                  Color(0xff1b588c)),
+                            ),
                             onPressed: authorize,
-                            child: Text(exception.toString()),
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: isPressState,
+                              builder: (_, isPress, __) {
+                                return isPress
+                                    ? CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : Text(
+                                        exception.toString(),
+                                        style: TextStyle(color: Colors.white),
+                                      );
+                              },
+                            ),
                           );
                         },
                       ),
@@ -240,11 +314,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: 'Уже есть аккаунт? ',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.white),
                       children: [
                         TextSpan(
                           text: 'Войти',
-                          style: TextStyle(color: Colors.blue),
+                          style: TextStyle(color: Colors.white70),
                         ),
                       ],
                     ),

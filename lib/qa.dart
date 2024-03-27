@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cgk/login.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
@@ -42,6 +43,7 @@ class QA {
 }
 
 bool timeGame = false;
+int answeredQuestions = 0;
 
 GlobalKey<_QuestionTimerState> globalKey = GlobalKey();
 
@@ -58,9 +60,14 @@ int questionIndex = 0;
 int last = 1;
 double time = 0;
 
-
 String twoDigits(int n) {
   return n.toString().padLeft(2, '0');
+}
+
+Future<void> addAnswered(int answered) async {
+  await Supabase.instance.client
+      .from('users')
+      .update({'rightAnswers': answered}).eq('email', '$userEmail');
 }
 
 class QuestionTimer extends StatefulWidget {
@@ -140,15 +147,14 @@ class _TrainingState extends State<Training> {
   //чтение данных из бд
   Future<List<QA>> readData() async {
     final response = await Supabase.instance.client.from('questions').select();
-    if (response is! Object) throw Exception('результат равен null');
-    return response
+    return TypeCast(response)
         .safeCast<List<Object?>>()
-        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
           (e) => QA(
-            id: e['id'].safeCast<int>(),
-            question: e['question'].safeCast<String>(),
-            answer: e['answer'].safeCast<String>(),
+            id: TypeCast(e['id']).safeCast<int>(),
+            question: TypeCast(e['question']).safeCast<String>(),
+            answer: TypeCast(e['answer']).safeCast<String>(),
           ),
         )
         .toList();
@@ -294,7 +300,98 @@ class _TrainingState extends State<Training> {
                             )
                           ],
                         ))
-                  : SizedBox.shrink(),
+                  : (last == content.length + 1
+                      ? SizedBox.shrink()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: SizedBox(
+                                height: 40,
+                                width: 135,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (_) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            'Вы действительно хотите завершить тренировку?',
+                                            style: TextStyle(fontSize: 20,), textAlign: TextAlign.center,
+                                          ),
+                                          backgroundColor: Colors.blueGrey,
+                                          content: SizedBox(
+                                            height: 180,
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      answeredQuestions +=
+                                                          answered.length;
+                                                      addAnswered(
+                                                          answeredQuestions);
+                                                      last = 1;
+                                                      questionIndex = 0;
+                                                      selected = 1;
+                                                      moved.clear();
+                                                      answered.clear();
+                                                      Navigator
+                                                          .pushAndRemoveUntil(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                            const SelectQuestion(),
+                                                          ),
+                                                              (route) => false);
+                                                    },
+                                                    child: Text(
+                                                      "Завершить",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  width: 170,
+                                                  height: 50,
+                                                ),
+                                                SizedBox(
+                                                  height: 30,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text(
+                                                      "Продолжить",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  width: 170,
+                                                  height: 50,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Text(
+                                    'Закончить тренировку',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        )),
               last == content.length + 1
                   ? SizedBox.shrink()
                   : SizedBox(
@@ -389,6 +486,8 @@ class _TrainingState extends State<Training> {
                                         ),
                                       ),
                                       onPressed: () {
+                                        answeredQuestions += answered.length;
+                                        addAnswered(answeredQuestions);
                                         last = 1;
                                         questionIndex = 0;
                                         selected = 1;
@@ -604,7 +703,8 @@ class _TrainingState extends State<Training> {
                                                   answered.add(
                                                       content[questionIndex]
                                                           .id);
-                                                  if(questionIndex != content.length-1){
+                                                  if (questionIndex !=
+                                                      content.length - 1) {
                                                     questionIndex++;
                                                   }
                                                   last++;
