@@ -206,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               builder: (_, isPress, __) {
                                 return isPress
                                     ? CircularProgressIndicator(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                       )
                                     : Text(
                                         'Войти',
