@@ -97,9 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     loginState.dispose();
+    obscureTextState.dispose();
+    isPressState.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

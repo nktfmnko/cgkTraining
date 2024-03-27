@@ -115,6 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void dispose() {
     registerState.dispose();
     obscureTextState.dispose();
+    isPressState.dispose();
     super.dispose();
   }
 
