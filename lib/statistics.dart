@@ -21,14 +21,14 @@ class stat extends StatefulWidget {
 
 class _statState extends State<stat> {
   final statisticState =
-      ValueNotifier<UnionState<List<userStat>>>(UnionState$Loading());
+      ValueNotifier<UnionState<userStat>>(UnionState$Loading());
 
-  Future<List<userStat>> readStat() async {
+  Future<userStat> readStat() async {
     final response = await Supabase.instance.client
         .from('users')
         .select('rightAnswers, selectedQuestions')
         .eq('email', '$userEmail');
-    return TypeCast(response)
+     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
@@ -38,6 +38,7 @@ class _statState extends State<stat> {
           ),
         )
         .toList();
+     return userStat(answered: data.last.answered, selected: data.last.selected);
   }
 
   Future<void> updateScreen() async {
@@ -70,7 +71,7 @@ class _statState extends State<stat> {
         child: Center(
           child: Column(
             children: <Widget>[
-              ValueUnionStateListener<List<userStat>>(
+              ValueUnionStateListener<userStat>(
                 unionListenable: statisticState,
                 contentBuilder: (content) {
                   return Column(
@@ -83,7 +84,7 @@ class _statState extends State<stat> {
                         ),
                       ),
                       Text(
-                        'Общее кол-во вопросов: ${content[0].selected}',
+                        'Общее кол-во вопросов: ${content.selected}',
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -95,9 +96,9 @@ class _statState extends State<stat> {
                         lineWidth: 20.0,
                         animation: true,
                         animationDuration: 1000,
-                        percent: content[0].answered / content[0].selected,
+                        percent: content.answered / content.selected,
                         center: Text(
-                          '${(content[0].answered / content[0].selected * 100).round()}%',
+                          '${(content.answered / content.selected * 100).round()}%',
                           style: const TextStyle(
                             fontSize: 40,
                             color: Colors.white,
@@ -109,7 +110,7 @@ class _statState extends State<stat> {
                       ),
                       const SizedBox(height: 25),
                       Text(
-                        'Кол-во взятых вопросов: ${content[0].answered}',
+                        'Кол-во взятых вопросов: ${content.answered}',
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,
