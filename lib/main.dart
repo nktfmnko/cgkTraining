@@ -1,4 +1,4 @@
-import 'package:cgk/login.dart';
+import 'package:cgk/menu.dart';
 import 'package:cgk/profile.dart';
 import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ Future<void> main() async {
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   //Раскомментировать, и написать название виджета, который вы вызываете
-  runApp(const MyApp());
+  runApp(const MaterialApp(home: menu()));
 }
 
 class MyApp extends StatelessWidget {
