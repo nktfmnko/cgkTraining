@@ -11,19 +11,17 @@ class SelectQuestion extends StatefulWidget {
 }
 
 class _SelectQuestionState extends State<SelectQuestion> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff3987c8),
+      backgroundColor: const Color(0xff4397de),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               'Выберите количество вопросов:',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 22, color: Colors.white),
             ),
             SizedBox(
               height: 20,
@@ -48,13 +46,14 @@ class _SelectQuestionState extends State<SelectQuestion> {
               children: [
                 Text(
                   "Игра со временем:",
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
                 Transform.scale(
                   scale: 1.2,
                   child: Checkbox(
                     checkColor: Colors.black,
                     activeColor: Colors.black26,
+                    side: BorderSide(color: Colors.black, width: 1.5),
                     value: timeGame,
                     onChanged: (bool? value) {
                       setState(
@@ -76,7 +75,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all(const Color(0xff418ecd)),
+                      MaterialStateProperty.all(const Color(0xff1b588c)),
                   shadowColor:
                       MaterialStateProperty.all(const Color(0xff418ecd)),
                   overlayColor: MaterialStateProperty.all(Colors.black12),
@@ -85,7 +84,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
                       borderRadius: BorderRadius.circular(10),
                       side: const BorderSide(
                         color: Colors.black,
-                        width: 1.5,
+                        width: 1.2,
                       ),
                     ),
                   ),
@@ -102,7 +101,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
                 child: Text(
                   "Начать",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 18,
                   ),
                 ),

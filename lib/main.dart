@@ -1,6 +1,5 @@
 import 'package:cgk/menu.dart';
 import 'package:cgk/profile.dart';
-import 'package:cgk/select_questions.dart';
 import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,11 +35,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(routes: {
-      '/': (context) => const SelectQuestion(),
-      '/statistic': (context) => const stat(),
-      '/timer': (context) => const StateTimerPage(),
-      '/profile': (context) => profile()
-    });
+    return MaterialApp(
+      routes: {
+        '/': (context) => const LoginScreen(),
+        '/statistic': (context) => const stat(),
+        '/timer': (context) => const StateTimerPage(),
+        '/profile': (context) => profile()
+      },
+      theme: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          selectionHandleColor: Colors.white,
+        ),
+      ),
+    );
   }
 }

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 typedef UnionStateContentBuilder<T> = Widget Function(T data);
 typedef UnionStateLoadingBuilder = Widget Function();
-typedef UnionStateErrorBuilder = Widget Function();
+typedef UnionStateErrorBuilder = Widget Function(Exception exception);
 
 class ValueUnionStateListener<T> extends StatefulWidget {
   final ValueListenable<UnionState<T>> unionListenable;
@@ -45,7 +45,7 @@ class _ValueUnionStateListenerState<T> extends State<ValueUnionStateListener<T>>
     return switch (state) {
       UnionState$Loading<T>() => widget.loadingBuilder(),
       final UnionState$Content<T> c => widget.contentBuilder(c.data),
-      UnionState$Error<T>() => widget.errorBuilder(),
+      UnionState$Error<T> e => widget.errorBuilder(e.exception),
     };
   }
 
