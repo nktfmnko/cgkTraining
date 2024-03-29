@@ -12,6 +12,14 @@ class userStat {
   const userStat({required this.answered, required this.selected});
 }
 
+class user {
+  final String name;
+  final int answered;
+  final double time;
+
+  const user({required this.name, required this.answered, required this.time});
+}
+
 class stat extends StatefulWidget {
   const stat({super.key});
 
@@ -22,13 +30,15 @@ class stat extends StatefulWidget {
 class _statState extends State<stat> {
   final statisticState =
       ValueNotifier<UnionState<userStat>>(UnionState$Loading());
+  final boardState =
+      ValueNotifier<UnionState<List<user>>>(UnionState$Loading());
 
   Future<userStat> readStat() async {
     final response = await Supabase.instance.client
         .from('users')
         .select('rightAnswers, selectedQuestions')
         .eq('email', '$userEmail');
-     final data = TypeCast(response)
+    final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
@@ -38,7 +48,24 @@ class _statState extends State<stat> {
           ),
         )
         .toList();
-     return userStat(answered: data.last.answered, selected: data.last.selected);
+    return userStat(answered: data.last.answered, selected: data.last.selected);
+  }
+
+  Future<List<user>> readUsers() async {
+    final response = await Supabase.instance.client
+        .from('users')
+        .select('name, rightAnswers, time');
+    return TypeCast(response)
+        .safeCast<List<Object?>>()
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map(
+          (e) => user(
+            name: TypeCast(e['name']).safeCast<String>(),
+            answered: TypeCast(e['rightAnswers']).safeCast<int>(),
+            time: TypeCast(e['time']).safeCast<double>(),
+          ),
+        )
+        .toList();
   }
 
   Future<void> updateScreen() async {
@@ -51,15 +78,27 @@ class _statState extends State<stat> {
     }
   }
 
+  Future<void> updateBoard() async {
+    try {
+      boardState.value = UnionState$Loading();
+      final data = await readUsers();
+      boardState.value = UnionState$Content(data);
+    } on Exception catch (e) {
+      boardState.value = UnionState$Error(e);
+    }
+  }
+
   @override
   void initState() {
     updateScreen();
+    updateBoard();
     super.initState();
   }
 
   @override
   void dispose() {
     statisticState.dispose();
+    boardState.dispose();
     super.dispose();
   }
 
