@@ -1,10 +1,7 @@
-import 'package:cgk/menu.dart';
-import 'package:cgk/profile.dart';
-import 'package:cgk/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'statistics.dart';
+import 'login.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -27,7 +24,7 @@ Future<void> main() async {
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   //Раскомментировать, и написать название виджета, который вы вызываете
-  runApp(const MaterialApp(home: menu()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,12 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: {
-        '/': (context) => const LoginScreen(),
-        '/statistic': (context) => const stat(),
-        '/timer': (context) => const StateTimerPage(),
-        '/profile': (context) => profile()
-      },
+      home: const LoginScreen(),
       theme: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
           selectionHandleColor: Colors.white,

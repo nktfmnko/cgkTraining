@@ -68,15 +68,12 @@ Future<void> addValue<T>(T value, String collumn) async {
         .from('users')
         .select('email, $collumn')
         .eq('email', '$userEmail');
-    await Supabase.instance.client
-        .from('users')
-        .update({'$collumn': data.last.values.last + value}).eq(
-            'email', '$userEmail');
+    await Supabase.instance.client.from('users').update(
+        {'$collumn': data.last.values.last + value}).eq('email', '$userEmail');
   } on Exception {
     throw new Exception('Ошибка');
   }
 }
-
 
 class QuestionTimer extends StatefulWidget {
   final VoidCallback notifyParent;
@@ -395,8 +392,8 @@ class _TrainingState extends State<Training> {
                                                 SizedBox(
                                                   child: ElevatedButton(
                                                     onPressed: () {
-                                                      addValue(
-                                                          answered.length, 'rightAnswers');
+                                                      addValue(answered.length,
+                                                          'rightAnswers');
                                                       last = 1;
                                                       questionIndex = 0;
                                                       selected = 1;
@@ -610,8 +607,11 @@ class _TrainingState extends State<Training> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        addValue(answered.length, 'rightAnswers');
-                                        timeGame ? addValue(time, 'time') : null;
+                                        addValue(
+                                            answered.length, 'rightAnswers');
+                                        timeGame
+                                            ? addValue(time, 'time')
+                                            : null;
                                         last = 1;
                                         questionIndex = 0;
                                         selected = 1;
@@ -901,19 +901,22 @@ class _TrainingState extends State<Training> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Ошибка, перезагрузите страницу'),
+                const Text(
+                  'Ошибка, перезагрузите страницу',
+                  style: TextStyle(color: Colors.white),
+                ),
                 ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(const Color(0xff418ecd)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                     shadowColor:
-                        MaterialStateProperty.all(const Color(0xff418ecd)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                   ),
                   onPressed: () {
                     updateScreen();
                   },
                   child: const Text('Обновить',
-                      style: TextStyle(color: Colors.black)),
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

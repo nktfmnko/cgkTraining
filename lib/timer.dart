@@ -77,9 +77,6 @@ class _StateTimerPageState extends State<StateTimerPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xff418ecd),
-      ),
       backgroundColor: const Color(0xff3987c8),
       body: Center(
         child: Column(
@@ -119,6 +116,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
+                      heroTag: "btn1",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         isStart ? pause() : start(context);
@@ -140,6 +138,7 @@ class _StateTimerPageState extends State<StateTimerPage> {
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
+                      heroTag: "btn2",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         restart();

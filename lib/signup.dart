@@ -1,6 +1,6 @@
 import 'package:cgk/login.dart';
+import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
-import 'package:cgk/select_questions.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
@@ -102,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       userEmail = mailController.text;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const SelectQuestion()),
+        MaterialPageRoute(builder: (_) => const menu()),
         (route) => false,
       );
     } on Exception {
