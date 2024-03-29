@@ -107,111 +107,113 @@ class _statState extends State<stat> {
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              ValueUnionStateListener<userStat>(
-                unionListenable: statisticState,
-                contentBuilder: (content) {
-                  return Column(
-                    children: [
-                      const Text(
-                        'Статистика:',
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Общее кол-во вопросов: ${content.selected}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-                      CircularPercentIndicator(
-                        radius: 105.0,
-                        lineWidth: 20.0,
-                        animation: true,
-                        animationDuration: 1000,
-                        percent: content.answered / content.selected,
-                        center: Text(
-                          '${(content.answered / content.selected * 100).round()}%',
-                          style: const TextStyle(
-                            fontSize: 40,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                ValueUnionStateListener<userStat>(
+                  unionListenable: statisticState,
+                  contentBuilder: (content) {
+                    return Column(
+                      children: [
+                        const Text(
+                          'Статистика:',
+                          style: TextStyle(
+                            fontSize: 30,
                             color: Colors.white,
                           ),
                         ),
-                        circularStrokeCap: CircularStrokeCap.round,
-                        progressColor: Colors.yellow,
-                        backgroundColor: Colors.black,
-                      ),
-                      const SizedBox(height: 25),
-                      Text(
-                        'Кол-во взятых вопросов: ${content.answered}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
+                        Text(
+                          'Общее кол-во вопросов: ${content.selected}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                },
-                loadingBuilder: () {
-                  return const SafeArea(
-                    child: Center(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 125,
+                        const SizedBox(height: 25),
+                        CircularPercentIndicator(
+                          radius: 105.0,
+                          lineWidth: 20.0,
+                          animation: true,
+                          animationDuration: 1000,
+                          percent: content.answered / content.selected,
+                          center: Text(
+                            '${(content.answered / content.selected * 100).round()}%',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              color: Colors.white,
+                            ),
+                          ),
+                          circularStrokeCap: CircularStrokeCap.round,
+                          progressColor: Colors.yellow,
+                          backgroundColor: Colors.black,
                         ),
-                        CircularProgressIndicator(
-                          color: Colors.white,
-                        )
+                        const SizedBox(height: 25),
+                        Text(
+                          'Кол-во взятых вопросов: ${content.answered}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
-                    )),
-                  );
-                },
-                errorBuilder: (_) {
-                  return SafeArea(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                    );
+                  },
+                  loadingBuilder: () {
+                    return const SafeArea(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
                             height: 125,
                           ),
-                          const Text(
-                            'Ошибка, перезагрузите страницу',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  const Color(0xff3987C8)),
-                              shadowColor: MaterialStateProperty.all(
-                                  const Color(0xff3987C8)),
-                            ),
-                            onPressed: () {
-                              updateScreen();
-                            },
-                            child: const Text('Обновить',
-                                style: TextStyle(color: Colors.white)),
-                          ),
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                          )
                         ],
+                      )),
+                    );
+                  },
+                  errorBuilder: (_) {
+                    return SafeArea(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 125,
+                            ),
+                            const Text(
+                              'Ошибка, перезагрузите страницу',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                                shadowColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                              ),
+                              onPressed: () {
+                                updateScreen();
+                              },
+                              child: const Text('Обновить',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              //Таблица лидеров
-              SizedBox(
-                height: 410,
-                width: 400,
-              ),
-            ],
+                    );
+                  },
+                ),
+                //Таблица лидеров
+                SizedBox(
+                  height: 410,
+                  width: 400,
+                ),
+              ],
+            ),
           ),
         ),
       ),
