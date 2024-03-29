@@ -90,7 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final mailsList = await readMails();
       if (mailsList.contains(mailController.text)) {
         registerState.error(
-            MessageException('Пользователь с такой почтой уже существует'));
+            MessageException('Такой пользователь уже существует'));
         isPressState.value = !isPressState.value;
         return;
       }

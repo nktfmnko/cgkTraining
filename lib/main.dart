@@ -35,11 +35,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(routes: {
-      '/': (context) => const LoginScreen(),
-      '/statistic': (context) => const stat(),
-      '/timer': (context) => const StateTimerPage(),
-      '/profile': (context) => profile()
-    });
+    return MaterialApp(
+      routes: {
+        '/': (context) => const LoginScreen(),
+        '/statistic': (context) => const stat(),
+        '/timer': (context) => const StateTimerPage(),
+        '/profile': (context) => profile()
+      },
+      theme: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          selectionHandleColor: Colors.white,
+        ),
+      ),
+    );
   }
 }
