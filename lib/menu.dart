@@ -5,7 +5,7 @@ import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'statistics.dart';
+import 'package:cgk/statistics.dart';
 
 class menu extends StatefulWidget {
   const menu({Key? key}) : super(key: key);
@@ -22,7 +22,6 @@ class _menu extends State<menu> {
         .from('users')
         .select('name, rightAnswers, time')
         .eq('email', '$userEmail');
-    ;
     final data = response
         .safeCast<List<Object?>>()
         .map((e) => e.safeCast<Map<String, Object?>>())
@@ -30,14 +29,11 @@ class _menu extends State<menu> {
           (e) => user(
             name: e['name'].safeCast<String>(),
             answered: e['rightAnswers'].safeCast<int>(),
-            time: e['time'].safeCast<double>(),
+            time: e['time'].safeCast<int>(),
           ),
         )
         .toList();
-    return user(
-        name: data.last.name,
-        answered: data.last.answered,
-        time: data.last.time);
+    return user(name: data.last.name, answered: data.last.answered, time: data.last.time);
   }
 
   Future<void> updateScreen() async {
@@ -99,7 +95,7 @@ class _menu extends State<menu> {
                     //вместо иконки
                     SizedBox(width: 180, height: 200),
                     Text(
-                      "$content.name",
+                      "${content.name}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,

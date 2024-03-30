@@ -15,7 +15,7 @@ class userStat {
 class user {
   final String name;
   final int answered;
-  final double time;
+  final int time;
 
   const user({required this.name, required this.answered, required this.time});
 }
@@ -62,7 +62,7 @@ class _statState extends State<stat> {
           (e) => user(
             name: TypeCast(e['name']).safeCast<String>(),
             answered: TypeCast(e['rightAnswers']).safeCast<int>(),
-            time: TypeCast(e['time']).safeCast<double>(),
+            time: TypeCast(e['time']).safeCast<int>(),
           ),
         )
         .toList();
