@@ -1,3 +1,4 @@
+import 'package:cgk/changeQuestions.dart';
 import 'package:cgk/login.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/timer.dart';
@@ -6,6 +7,14 @@ import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cgk/statistics.dart';
+
+extension TypeCast<T> on T? {
+  R safeCast<R>() {
+    final value = this;
+    if (value is R) return value;
+    throw Exception('не удалось привести тип $runtimeType к типу $R');
+  }
+}
 
 class userWithPic {
   final String name;
@@ -38,16 +47,16 @@ class _menu extends State<menu> {
         .from('users')
         .select('name, rightAnswers, time, picture, admin')
         .eq('email', '$userEmail');
-    final data = response
+    final data = TypeCast(response)
         .safeCast<List<Object?>>()
-        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
           (e) => userWithPic(
-            name: e['name'].safeCast<String>(),
-            answered: e['rightAnswers'].safeCast<int>(),
-            time: e['time'].safeCast<int>(),
-            picture: e['picture'].safeCast<String>(),
-            admin: e['admin'].safeCast<bool>(),
+            name: TypeCast(e['name']).safeCast<String>(),
+            answered: TypeCast(e['rightAnswers']).safeCast<int>(),
+            time: TypeCast(e['time']).safeCast<int>(),
+            picture: TypeCast(e['picture']).safeCast<String>(),
+            admin: TypeCast(e['admin']).safeCast<bool>(),
           ),
         )
         .toList();
@@ -225,7 +234,14 @@ class _menu extends State<menu> {
                                 ),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => adminChange(),
+                                ),
+                              );
+                            },
                             child: Text(
                               'Добавить вопрос',
                               style: TextStyle(
