@@ -33,7 +33,10 @@ class _menu extends State<menu> {
           ),
         )
         .toList();
-    return user(name: data.last.name, answered: data.last.answered, time: data.last.time);
+    return user(
+        name: data.last.name,
+        answered: data.last.answered,
+        time: data.last.time);
   }
 
   Future<void> updateScreen() async {
@@ -66,19 +69,18 @@ class _menu extends State<menu> {
     bool? sound = true;
     //Вибрация
     bool? vib = true;
+    //admin
+    bool admin = true;
     return Scaffold(
       backgroundColor: const Color(0xff4397de),
       body: ValueUnionStateListener<user>(
         unionListenable: menuState,
         loadingBuilder: () {
-          return const SafeArea(
+          return SafeArea(
             child: Center(
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 125,
-                ),
                 CircularProgressIndicator(
                   color: Colors.white,
                 )
@@ -93,12 +95,12 @@ class _menu extends State<menu> {
                 Row(
                   children: [
                     //вместо иконки
-                    SizedBox(width: 180, height: 200),
+                    SizedBox(width: 160, height: 200),
                     Text(
                       "${content.name}",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 30,
+                        fontSize: 23,
                       ),
                     ),
                   ],
@@ -125,7 +127,7 @@ class _menu extends State<menu> {
                   child: Text(
                     'Играть',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 30,
                     ),
                   ),
@@ -153,7 +155,7 @@ class _menu extends State<menu> {
                   child: Text(
                     'Статистика',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 30,
                     ),
                   ),
@@ -181,12 +183,43 @@ class _menu extends State<menu> {
                   child: Text(
                     'Таймер',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 30,
                     ),
                   ),
                 ),
                 SizedBox(height: 1 / 20 * height),
+                admin
+                    ? Column(
+                        children: <Widget>[
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all(
+                                  Size(8 / 9 * width, 1 / 12 * height)),
+                              backgroundColor: MaterialStateProperty.all(
+                                  Color.fromRGBO(57, 135, 200, 1)),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: const BorderSide(
+                                      width: 1.5, color: Colors.black),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              'Добавить вопрос',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 1 / 20 * height),
+                        ],
+                      )
+                    : SizedBox.shrink(),
                 ElevatedButton(
                   style: ButtonStyle(
                     fixedSize: MaterialStateProperty.all(
@@ -223,7 +256,7 @@ class _menu extends State<menu> {
                                   title: Text(
                                     'Звук',
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: Colors.white,
                                       fontSize: 27,
                                     ),
                                   ),
@@ -245,7 +278,7 @@ class _menu extends State<menu> {
                                   title: Text(
                                     'Вибрация',
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: Colors.white,
                                       fontSize: 27,
                                     ),
                                   ),
@@ -266,7 +299,7 @@ class _menu extends State<menu> {
                             child: Text(
                               'Назад',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: width / height * 40,
                               ),
                             ),
@@ -278,7 +311,7 @@ class _menu extends State<menu> {
                   child: Text(
                     'Настройки',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 30,
                     ),
                   ),
@@ -293,9 +326,6 @@ class _menu extends State<menu> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    height: 125,
-                  ),
                   const Text(
                     'Ошибка, перезагрузите страницу',
                     style: TextStyle(color: Colors.white),
