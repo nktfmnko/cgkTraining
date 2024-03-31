@@ -7,6 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cgk/statistics.dart';
 
+class userWithPic {
+  final String name;
+  final int answered;
+  final int time;
+  final String picture;
+  final bool admin;
+
+  const userWithPic(
+      {required this.name,
+      required this.answered,
+      required this.time,
+      required this.picture,
+      required this.admin});
+}
+
 class menu extends StatefulWidget {
   const menu({Key? key}) : super(key: key);
 
@@ -15,28 +30,33 @@ class menu extends StatefulWidget {
 }
 
 class _menu extends State<menu> {
-  final menuState = ValueNotifier<UnionState<user>>(UnionState$Loading());
+  final menuState =
+      ValueNotifier<UnionState<userWithPic>>(UnionState$Loading());
 
-  Future<user> readUser() async {
+  Future<userWithPic> readUser() async {
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time')
+        .select('name, rightAnswers, time, picture, admin')
         .eq('email', '$userEmail');
     final data = response
         .safeCast<List<Object?>>()
         .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
-          (e) => user(
+          (e) => userWithPic(
             name: e['name'].safeCast<String>(),
             answered: e['rightAnswers'].safeCast<int>(),
             time: e['time'].safeCast<int>(),
+            picture: e['picture'].safeCast<String>(),
+            admin: e['admin'].safeCast<bool>(),
           ),
         )
         .toList();
-    return user(
+    return userWithPic(
         name: data.last.name,
         answered: data.last.answered,
-        time: data.last.time);
+        time: data.last.time,
+        picture: data.last.picture,
+        admin: data.last.admin);
   }
 
   Future<void> updateScreen() async {
@@ -69,11 +89,9 @@ class _menu extends State<menu> {
     bool? sound = true;
     //Вибрация
     bool? vib = true;
-    //admin
-    bool admin = true;
     return Scaffold(
       backgroundColor: const Color(0xff4397de),
-      body: ValueUnionStateListener<user>(
+      body: ValueUnionStateListener<userWithPic>(
         unionListenable: menuState,
         loadingBuilder: () {
           return SafeArea(
@@ -189,7 +207,7 @@ class _menu extends State<menu> {
                   ),
                 ),
                 SizedBox(height: 1 / 20 * height),
-                admin
+                content.admin
                     ? Column(
                         children: <Widget>[
                           ElevatedButton(
