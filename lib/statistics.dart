@@ -16,8 +16,9 @@ class user {
   final String name;
   final int answered;
   final int time;
+  final int timeAnswered;
 
-  const user({required this.name, required this.answered, required this.time});
+  const user({required this.name, required this.answered, required this.time, required this.timeAnswered});
 }
 
 class stat extends StatefulWidget {
@@ -54,7 +55,7 @@ class _statState extends State<stat> {
   Future<List<user>> readUsers() async {
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time');
+        .select('name, rightAnswers, time, timeAnswered');
     return TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
@@ -63,6 +64,7 @@ class _statState extends State<stat> {
             name: TypeCast(e['name']).safeCast<String>(),
             answered: TypeCast(e['rightAnswers']).safeCast<int>(),
             time: TypeCast(e['time']).safeCast<int>(),
+            timeAnswered : TypeCast(e['timeAnswered']).safeCast<int>(),
           ),
         )
         .toList();
@@ -217,9 +219,9 @@ class _statState extends State<stat> {
                   width: double.infinity,
                   child: ValueUnionStateListener<List<user>>(
                     unionListenable: boardState,
-                    contentBuilder: (content) {
+                    contentBuilder: (content) { 
                           if (value == "TIME"){
-                            content.sort((p1, p2) => p1.time.compareTo(p2.time));
+                            content.sort((p1, p2) => (p1.time / p1.timeAnswered).compareTo(p2.time / p2.timeAnswered));
                           }
                           else {
                             content.sort((p1, p2) => p2.answered.compareTo(p1.answered));
@@ -245,7 +247,7 @@ class _statState extends State<stat> {
                                 const Spacer(),
                                 DropdownButton<String>(
                                   style: const TextStyle(color: Colors.white, fontSize: 17),
-                                  dropdownColor: Colors.black,
+                                  dropdownColor: Color(0xff3987C8),
                                   value: value,
                                   icon: const Icon(Icons.arrow_drop_down_rounded),
                                   onChanged: (String? newValue)
@@ -302,7 +304,8 @@ class _statState extends State<stat> {
                                   width: 100,
                                   child: Center(
                                     child: Text(
-                                      value == "POINT"? content[index].answered.toString(): content[index].time.toString(),
+                                      value == "POINT"? content[index].answered.toString(): 
+                                        content[index].timeAnswered == 0? "0": (content[index].time / content[index].timeAnswered).toString(),
                                       style: const TextStyle(color: Colors.white, fontSize: 17),
                                     ),
                                   ),
