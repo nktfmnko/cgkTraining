@@ -5,6 +5,7 @@ import 'package:cgk/timer.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cgk/statistics.dart';
 
@@ -43,10 +44,11 @@ class _menu extends State<menu> {
       ValueNotifier<UnionState<userWithPic>>(UnionState$Loading());
 
   Future<userWithPic> readUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await Supabase.instance.client
         .from('users')
         .select('name, rightAnswers, time, picture, admin')
-        .eq('email', '$userEmail');
+        .eq('email', '${rememberMe ? (prefs.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())

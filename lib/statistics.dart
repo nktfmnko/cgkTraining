@@ -3,6 +3,7 @@ import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class userStat {
@@ -35,10 +36,11 @@ class _statState extends State<stat> {
       ValueNotifier<UnionState<List<user>>>(UnionState$Loading());
 
   Future<userStat> readStat() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await Supabase.instance.client
         .from('users')
         .select('rightAnswers, selectedQuestions')
-        .eq('email', '$userEmail');
+        .eq('email', '${rememberMe ? (prefs.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())

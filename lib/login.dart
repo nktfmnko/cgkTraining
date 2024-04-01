@@ -4,6 +4,7 @@ import 'package:cgk/signup.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 extension TypeCast<T> on T? {
@@ -15,6 +16,7 @@ extension TypeCast<T> on T? {
 }
 
 String? userEmail;
+bool rememberMe = false;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -82,6 +84,9 @@ class _LoginScreenState extends State<LoginScreen> {
         isPressState.value = !isPressState.value;
         return;
       }
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("mail", mailController.text);
+      prefs.setBool("remember", rememberMe);
       userEmail = mailController.text;
       Navigator.pushAndRemoveUntil(
         context,
@@ -101,6 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
     isPressState.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,15 +191,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 1,
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Забыли пароль?',
-                          style: TextStyle(color: Colors.white),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          child: Row(
+                            children: [
+                              Text(
+                                'Запомнить меня:',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Checkbox(
+                                checkColor: Colors.black,
+                                activeColor: Colors.black26,
+                                side:
+                                    BorderSide(color: Colors.black, width: 1.5),
+                                value: rememberMe,
+                                onChanged: (value) {
+                                  setState(
+                                    () {
+                                      rememberMe = value!;
+                                    },
+                                  );
+                                },
+                              )
+                            ],
+                          ),
                         ),
-                      ),
+                        Align(
+                          child: TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Забыли пароль?',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
                       width: double.infinity,

@@ -1,5 +1,7 @@
+import 'package:cgk/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login.dart';
 
@@ -23,8 +25,15 @@ Future<void> main() async {
     overlays: [SystemUiOverlay.top],
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  isRemembered();
   //Раскомментировать, и написать название виджета, который вы вызываете
   runApp(const MyApp());
+}
+
+
+Future<void> isRemembered() async{
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  rememberMe = prefs.getBool("remember") ?? false;
 }
 
 class MyApp extends StatelessWidget {
@@ -33,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const LoginScreen(),
+      home: rememberMe ? const menu() : const LoginScreen(),
       theme: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
           selectionHandleColor: Colors.white,
