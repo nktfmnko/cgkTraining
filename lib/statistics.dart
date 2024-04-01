@@ -305,7 +305,7 @@ class _statState extends State<stat> {
                                   child: Center(
                                     child: Text(
                                       value == "POINT"? content[index].answered.toString(): 
-                                        content[index].timeAnswered == 0? "0": (content[index].time / content[index].timeAnswered).toString(),
+                                        content[index].timeAnswered == 0? "0": (content[index].time / content[index].timeAnswered).toStringAsFixed(2),
                                       style: const TextStyle(color: Colors.white, fontSize: 17),
                                     ),
                                   ),
