@@ -137,8 +137,8 @@ class _statState extends State<stat> {
                           lineWidth: 20.0,
                           animation: true,
                           animationDuration: 1000,
-                          percent: content.answered / content.selected,
-                          center: Text(
+                          percent: content.selected == 0 ? 0 : content.answered / content.selected,
+                          center: Text(content.selected == 0 ? '0%' :
                             '${(content.answered / content.selected * 100).round()}%',
                             style: const TextStyle(
                               fontSize: 40,

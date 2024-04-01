@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cgk/login.dart';
+import 'package:cgk/menu.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
@@ -295,7 +296,7 @@ class _TrainingState extends State<Training> {
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const SelectQuestion(),
+                                                            const menu(),
                                                       ),
                                                       (route) => false);
                                                 },
@@ -404,7 +405,7 @@ class _TrainingState extends State<Training> {
                                                               MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        const SelectQuestion(),
+                                                                        const menu(),
                                                               ),
                                                               (route) => false);
                                                     },
@@ -610,7 +611,11 @@ class _TrainingState extends State<Training> {
                                         addValue(
                                             answered.length, 'rightAnswers');
                                         timeGame
-                                            ? addValue(time, 'time')
+                                            ? {
+                                                addValue(time, 'time'),
+                                                addValue(answered.length,
+                                                    'timeAnswered')
+                                              }
                                             : null;
                                         last = 1;
                                         questionIndex = 0;
@@ -621,7 +626,7 @@ class _TrainingState extends State<Training> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  const SelectQuestion(),
+                                                  const menu(),
                                             ),
                                             (route) => false);
                                       },
