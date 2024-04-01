@@ -611,7 +611,11 @@ class _TrainingState extends State<Training> {
                                         addValue(
                                             answered.length, 'rightAnswers');
                                         timeGame
-                                            ? addValue(time, 'time')
+                                            ? {
+                                                addValue(time, 'time'),
+                                                addValue(answered.length,
+                                                    'timeAnswered')
+                                              }
                                             : null;
                                         last = 1;
                                         questionIndex = 0;
