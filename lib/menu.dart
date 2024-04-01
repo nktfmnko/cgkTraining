@@ -124,6 +124,7 @@ class _menu extends State<menu> {
     }
   }
 
+
   @override
   void initState() {
     updateScreen();
@@ -213,6 +214,7 @@ class _menu extends State<menu> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      SizedBox(width: width / 20),
                       //вместо иконки
                       SizedBox(
                         width: width * 1 / 3,
@@ -224,6 +226,7 @@ class _menu extends State<menu> {
                           onTap: () => showDialog<String>(
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
+                                backgroundColor: Color(0xff4397de),
                                 content: new SizedBox(
                                     height: height * 22 / 100,
                                     width: width / 5,
@@ -249,23 +252,27 @@ class _menu extends State<menu> {
                                             width: 120,
                                             child: Align(
                                                 alignment: Alignment.center,
-                                                child: Text(content.name,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 26))),
+                                                child: SingleChildScrollView(
+                                                    scrollDirection: Axis.horizontal,
+                                                      child : SizedBox(
+                                                        width: 240,
+                                                          child: Text(content.name,
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 26))))),
                                           ),
                                         ]),
                                         Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text('Взятых вопросов: ${content.answered}',
                                                 style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Colors.white,
                                                     fontSize: 20))),
                                         Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text('Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
                                                 style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Colors.white,
                                                     fontSize: 20))),
                                       ],
                                     )),
@@ -274,7 +281,9 @@ class _menu extends State<menu> {
                                     onPressed: () =>
                                         Navigator.pop(context, 'Готово'),
                                     child: const Text('Готово',
-                                        style: TextStyle(fontSize: 20)),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20)),
                                   ),
                                 ]),
                           ),
@@ -285,15 +294,28 @@ class _menu extends State<menu> {
                           ),
                         ),
                       ),
-                      Text(
-                        "${content.name}",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 23,
-                        ),
+                      SizedBox(width: width / 20),
+                      SizedBox(
+                        width: width * 32/60,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SizedBox(
+                            width: width * 40/60,
+                              child: Text(
+                          "${content.name}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                          ))),
                       ),
+                      ),
+                      SizedBox(
+                        width: width * 2/60
+                      )
                     ],
                   ),
+              SizedBox(
+                height: height / 40),
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: MaterialStateProperty.all(
