@@ -3,6 +3,7 @@ import 'package:cgk/timer1.dart';
 import 'package:cgk/timer2.dart';
 import 'package:cgk/timer3.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class StateTimerPage extends StatelessWidget {
   const StateTimerPage({Key? key}) : super(key: key);
@@ -17,23 +18,33 @@ class StateTimerPage extends StatelessWidget {
             length: 3,
             child: Scaffold(
               appBar: AppBar(
-                backgroundColor: Theme
-                    .of(context)
-                    .colorScheme
-                    .inversePrimary,
+                backgroundColor: const Color(0xff4397de),
                 centerTitle: true,
                 title: const Text("Timers"),
-                bottom: const TabBar(
+                bottom: TabBar(
+                    indicatorColor: const Color(0xff418ecd),
                     padding: EdgeInsets.all(1),
                     tabs: [
                       Tab(
-                        icon: Icon(Icons.timelapse),
+                        icon: SvgPicture.asset(
+                            'assets/Group 1.svg',
+                            width: 25.0,
+                            height: 25.0,
+                        ),
                       ),
                       Tab(
-                        icon: Icon(Icons.timelapse_outlined),
+                          icon: SvgPicture.asset(
+                              'assets/Group 2.svg',
+                              width: 25.0,
+                              height: 25.0,
+                          )
                       ),
                       Tab(
-                        icon: Icon(Icons.timelapse_rounded),
+                          icon: SvgPicture.asset(
+                              'assets/Group 3.svg',
+                              width: 25.0,
+                              height: 25.0,
+                          )
                       )
                     ]
                 ),

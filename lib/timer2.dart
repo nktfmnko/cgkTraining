@@ -115,7 +115,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
                 ),
                 Positioned(
                     bottom: 0,
-                    left: 117,
+                    left: 120.5,
                     child: Container(
                       width: 20,
                       height: 20,

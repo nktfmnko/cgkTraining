@@ -120,7 +120,7 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
                 ),
                 Positioned(
                   bottom: 60,
-                  left: 15,
+                  left: 17,
                   child: Container(
                     width: 20,
                     height: 20,
@@ -132,7 +132,7 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
                 ),
                 Positioned(
                     bottom: 60,
-                    left: 220.5,
+                    left: 225,
                     child: Container(
                       width: 20,
                       height: 20,

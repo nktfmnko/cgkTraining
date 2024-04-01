@@ -40,6 +40,7 @@ dependencies:
   email_validator: '^2.1.16'
   vibration: ^1.8.4
   audioplayers: ^1.0.1
+  flutter_svg: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,6 +72,9 @@ flutter:
   assets:
      - assets/avatar_image.png
      - assets/startTimer.mp3
+     - assets/Group 1.svg
+     - assets/Group 2.svg
+     - assets/Group 3.svg
 
 
 
