@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cgk/changeQuestions.dart';
 import 'package:cgk/login.dart';
 import 'package:cgk/select_questions.dart';
@@ -5,8 +7,10 @@ import 'package:cgk/timer.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cgk/statistics.dart';
+
 
 extension TypeCast<T> on T? {
   R safeCast<R>() {
@@ -122,7 +126,83 @@ class _menu extends State<menu> {
                 Row(
                   children: [
                     //вместо иконки
-                    SizedBox(width: 160, height: 200),
+                    SizedBox(
+                        width: width * 1 / 3,
+                        height: width * 1 / 3,
+                        // Inkwell
+                        child: InkWell(
+                          radius: 100,
+                          // display a snackbar on tap
+                          onTap: () => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                                content: new SizedBox(
+                                    height: height * 22 / 100,
+                                    width: width / 5,
+                                    child: Column(
+                                      children: [
+                                        Row(children: [
+                                          SizedBox(
+                                              width: 100,
+                                              height: 100,
+                                              child: InkWell(
+                                                radius: 50,
+                                                // изменение картинки профиля
+                                                onTap: () async {
+                                              final ImagePicker picker = ImagePicker();
+
+                                              final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                                              //if (image != null)
+
+                                              File file = File(image!.path);
+
+
+
+                                              },
+                                                child: Ink.image(
+                                                  fit: BoxFit.cover,
+                                                  image: const NetworkImage(
+                                                      'https://www.kindacode.com/wp-content/uploads/2022/07/bottle.jpeg'),
+                                                ),
+                                              )),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          SizedBox(
+                                            height: 100,
+                                            width: 120,
+                                            child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text("Имя Фамилия",
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 26))),
+                                          ),
+                                        ]),
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text('Взятых вопросов:',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 20))),
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text('Среднее время:',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 20))),
+                                      ],
+                                    )),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Готово'),
+                                    child: const Text('Готово',
+                                        style: TextStyle(fontSize: 20)),
+                                  ),
+                                ]),
+                          ),
+                        )),
                     Text(
                       "${content.name}",
                       style: TextStyle(
