@@ -1,5 +1,6 @@
 import 'package:cgk/changeQuestions.dart';
 import 'package:cgk/login.dart';
+import 'package:cgk/main.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/timer.dart';
 import 'package:cgk/union_state.dart';
@@ -49,7 +50,7 @@ class _menu extends State<menu> {
         .from('users')
         .select('name, rightAnswers, time, picture, admin')
         .eq('email',
-            '${rememberMe ? (prefs.getString('mail') ?? "") : userEmail}');
+            '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
@@ -69,6 +70,20 @@ class _menu extends State<menu> {
         time: data.last.time,
         picture: data.last.picture,
         admin: data.last.admin);
+  }
+
+  Future<void> exit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("remember");
+    prefs.remove("mail");
+    rememberMe = false;
+    Navigator.of(context, rootNavigator: true).pop();
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const MyApp(),
+        ),
+        (route) => false);
   }
 
   Future<void> updateScreen() async {
@@ -127,9 +142,43 @@ class _menu extends State<menu> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       color: Colors.white70,
-                      icon: Icon(Icons.exit_to_app, ),
+                      icon: Icon(
+                        Icons.exit_to_app,
+                      ),
                       onPressed: () {
-
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: Color(0xff4397de),
+                              title: Text(
+                                'Вы уверены, что хотите выйти?',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              content: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: exit,
+                                    child: Text(
+                                      'Да',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      'Нет',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
@@ -155,14 +204,16 @@ class _menu extends State<menu> {
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(width: 1.5, color: Colors.black),
+                          side:
+                              const BorderSide(width: 1.5, color: Colors.black),
                         ),
                       ),
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SelectQuestion()),
+                        MaterialPageRoute(
+                            builder: (context) => SelectQuestion()),
                       );
                     },
                     child: Text(
@@ -183,7 +234,8 @@ class _menu extends State<menu> {
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(width: 1.5, color: Colors.black),
+                          side:
+                              const BorderSide(width: 1.5, color: Colors.black),
                         ),
                       ),
                     ),
@@ -211,14 +263,16 @@ class _menu extends State<menu> {
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(width: 1.5, color: Colors.black),
+                          side:
+                              const BorderSide(width: 1.5, color: Colors.black),
                         ),
                       ),
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => StateTimerPage()),
+                        MaterialPageRoute(
+                            builder: (context) => StateTimerPage()),
                       );
                     },
                     child: Text(
@@ -277,7 +331,8 @@ class _menu extends State<menu> {
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(width: 1.5, color: Colors.black),
+                          side:
+                              const BorderSide(width: 1.5, color: Colors.black),
                         ),
                       ),
                     ),
@@ -288,14 +343,15 @@ class _menu extends State<menu> {
                           backgroundColor: Color(0xff4397de),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(width: 1.5, color: Colors.black)),
+                              side:
+                                  BorderSide(width: 1.5, color: Colors.black)),
                           content: SizedBox(
                             width: 3 / 4 * width,
                             height: 1 / 7 * height,
                             child: Column(
                               children: [
-                                StatefulBuilder(builder:
-                                    (BuildContext context, StateSetter setState) {
+                                StatefulBuilder(builder: (BuildContext context,
+                                    StateSetter setState) {
                                   return CheckboxListTile(
                                     checkColor: Colors.white,
                                     activeColor: Colors.black,
@@ -316,8 +372,8 @@ class _menu extends State<menu> {
                                     },
                                   );
                                 }),
-                                StatefulBuilder(builder:
-                                    (BuildContext context, StateSetter setState) {
+                                StatefulBuilder(builder: (BuildContext context,
+                                    StateSetter setState) {
                                   return CheckboxListTile(
                                     checkColor: Colors.white,
                                     activeColor: Colors.black,

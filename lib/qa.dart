@@ -6,6 +6,7 @@ import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vibration/vibration.dart';
 
@@ -65,12 +66,13 @@ String twoDigits(int n) {
 
 Future<void> addValue<T>(T value, String collumn) async {
   try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final data = await Supabase.instance.client
         .from('users')
         .select('email, $collumn')
-        .eq('email', '$userEmail');
+        .eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
     await Supabase.instance.client.from('users').update(
-        {'$collumn': data.last.values.last + value}).eq('email', '$userEmail');
+        {'$collumn': data.last.values.last + value}).eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
   } on Exception {
     throw new Exception('Ошибка');
   }
