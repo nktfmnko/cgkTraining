@@ -102,6 +102,7 @@ class _statState extends State<stat> {
     super.dispose();
   }
 
+  String value = "POINT";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,10 +208,166 @@ class _statState extends State<stat> {
                     );
                   },
                 ),
+                SizedBox(
+                  height: 30,
+                ),
                 //Таблица лидеров
                 SizedBox(
-                  height: 410,
-                  width: 400,
+                  height: 320,
+                  width: double.infinity,
+                  child: ValueUnionStateListener<List<user>>(
+                    unionListenable: boardState,
+                    contentBuilder: (content) {
+                          if (value == "TIME"){
+                            content.sort((p1, p2) => p1.time.compareTo(p2.time));
+                          }
+                          else {
+                            content.sort((p1, p2) => p2.answered.compareTo(p1.answered));
+                          }
+                       return Scaffold(
+                        backgroundColor: const Color(0xff3987C8),
+                        appBar: AppBar(
+                          leadingWidth: 0,
+                          leading: Text(""),
+                          backgroundColor: const Color(0xff3987C8),
+                          toolbarHeight: 90,
+                          title:  Column(
+                            children: [
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              const Text("Таблица лидеров", style: TextStyle(color: Colors.white)),
+                              Row(
+                                children: [
+                                const Text("Ранг", style: TextStyle(color: Colors.white, fontSize: 17)),
+                                const Spacer(),
+                                const Text("Имя", style: TextStyle(color: Colors.white, fontSize: 17)),
+                                const Spacer(),
+                                DropdownButton<String>(
+                                  style: const TextStyle(color: Colors.white, fontSize: 17),
+                                  dropdownColor: Colors.black,
+                                  value: value,
+                                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                                  onChanged: (String? newValue)
+                                  {
+                                    setState(() {
+                                      value = newValue!;
+                                    });
+                                  },
+                                  items: const [
+                                    DropdownMenuItem<String>(
+                                      value: "TIME",
+                                      child: Text("Время")
+                                      ),
+                                      DropdownMenuItem<String>(
+                                      value: "POINT",
+                                      child: Text("Очки")
+                                      )
+                                  ], 
+                                ),
+                                ]
+                                ),
+                              const Divider()
+                            ],
+                          ),
+                        ),
+                        body: ListView.separated(
+                          itemCount: content.length,
+                          itemBuilder: (context, index) {
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 60,
+                                  child: Center(
+                                    child: Text(
+                                      (index + 1).toString(),
+                                      style: const TextStyle(color: Colors.white, fontSize: 17),
+                                    ),
+                                  ),
+                                ),
+                                const CircleAvatar(
+                                  backgroundColor: Colors.black,
+                                  radius: 12,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                  height: 10,
+                                ),
+                                Text(
+                                  content[index].name,
+                                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 100,
+                                  child: Center(
+                                    child: Text(
+                                      value == "POINT"? content[index].answered.toString(): content[index].time.toString(),
+                                      style: const TextStyle(color: Colors.white, fontSize: 17),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const Divider(
+                              height: 10,
+                              indent: 15,
+                              endIndent: 15,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    loadingBuilder: () {
+                      return const SafeArea(
+                        child: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 125,
+                            ),
+                            CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          ],
+                        )),
+                      );
+                    },
+                    errorBuilder: (_) {
+                      return SafeArea(
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 125,
+                              ),
+                              const Text(
+                                'Ошибка, перезагрузите страницу',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      const Color(0xff3987C8)),
+                                  shadowColor: MaterialStateProperty.all(
+                                      const Color(0xff3987C8)),
+                                ),
+                                onPressed: () {
+                                  updateBoard();
+                                },
+                                child: const Text('Обновить',
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -220,3 +377,4 @@ class _statState extends State<stat> {
     );
   }
 }
+
