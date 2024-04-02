@@ -46,13 +46,9 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
           AudioPlayer().play(AssetSource('startTimer.mp3'));
           pause();
         } else if (_waitTime == 20) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Temporary stop')));
           AudioPlayer().play(AssetSource('startTimer.mp3'));
           pause();
         } else if (_waitTime == 40) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Temporary stop')));
           AudioPlayer().play(AssetSource('startTimer.mp3'));
           pause();
         }
