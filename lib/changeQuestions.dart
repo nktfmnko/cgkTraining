@@ -77,6 +77,7 @@ class _adminChangeState extends State<adminChange> {
         return;
       }
       isPressAddState.value = !isPressAddState.value;
+      setState(() {});
       if (q.any((element) => element.question == questionController.text)) {
         addQuestionState.error(MessageException('Такой вопрос уже есть'));
         isPressAddState.value = !isPressAddState.value;
@@ -423,7 +424,9 @@ class _adminChangeState extends State<adminChange> {
                                             ),
                                           ),
                                         ),
-                                        onPressed: () => addQuestion(content),
+                                        onPressed: isPressAddState.value
+                                            ? null
+                                            : () => addQuestion(content),
                                         child: ValueListenableBuilder<bool>(
                                           valueListenable: isPressAddState,
                                           builder: (_, isPress, __) {
@@ -460,7 +463,9 @@ class _adminChangeState extends State<adminChange> {
                                               MaterialStatePropertyAll<Color>(
                                                   Color(0xff1b588c)),
                                         ),
-                                        onPressed: () => addQuestion(content),
+                                        onPressed: isPressAddState.value
+                                            ? null
+                                            : () => addQuestion(content),
                                         child: ValueListenableBuilder<bool>(
                                           valueListenable: isPressAddState,
                                           builder: (_, isPress, __) {
