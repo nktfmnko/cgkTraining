@@ -89,7 +89,6 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     updateScreen();
-    hidebar();
     super.initState();
   }
 
@@ -101,6 +100,7 @@ class _TrainingState extends State<Training> {
 
   @override
   Widget build(BuildContext context) {
+    hidebar();
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       appBar: AppBar(
@@ -266,7 +266,7 @@ class _TrainingState extends State<Training> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 22),
+                            padding: const EdgeInsets.only(bottom: 12),
                             child: SizedBox(
                               width: 250,
                               height: 50,
