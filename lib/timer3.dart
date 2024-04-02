@@ -119,12 +119,17 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SvgPicture.asset(
-                  'assets/Group 5.svg',
-                  alignment: Alignment.center,
-                  width: size.width * 0.35,
-                  height: size.height * 0.35,
-                ),
+                Container(
+                  height: size.height * 0.34,
+                  width: size.height * 0.315,
+                  alignment: Alignment.topCenter,
+                  child: SvgPicture.asset(
+                    'assets/Group 5.svg',
+                    alignment: Alignment.topCenter,
+                    width: size.width * 0.315,
+                    height: size.height * 0.34,
+                  ),
+                )
               ],
             ),
             Row(
