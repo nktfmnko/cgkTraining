@@ -2,6 +2,7 @@ import 'package:cgk/login.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,8 +19,9 @@ class user {
   final int answered;
   final int time;
   final int timeAnswered;
+  final String picture;
 
-  const user({required this.name, required this.answered, required this.time, required this.timeAnswered});
+  const user({required this.name, required this.answered, required this.time, required this.timeAnswered, required  this.picture});
 }
 
 class stat extends StatefulWidget {
@@ -57,7 +59,7 @@ class _statState extends State<stat> {
   Future<List<user>> readUsers() async {
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time, timeAnswered');
+        .select('name, rightAnswers, time, timeAnswered, picture');
     return TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
@@ -67,6 +69,7 @@ class _statState extends State<stat> {
             answered: TypeCast(e['rightAnswers']).safeCast<int>(),
             time: TypeCast(e['time']).safeCast<int>(),
             timeAnswered : TypeCast(e['timeAnswered']).safeCast<int>(),
+            picture: TypeCast(e['picture']).safeCast<String>()
           ),
         )
         .toList();
@@ -289,7 +292,9 @@ class _statState extends State<stat> {
                                     ),
                                   ),
                                 ),
-                                const CircleAvatar(
+                                 CircleAvatar(
+                                  backgroundImage:  content[index].picture.isEmpty? 
+                                  Image.asset("assets/avatar_image.png").image:  Image(image: NetworkImage(content[index].picture)).image,
                                   backgroundColor: Colors.black,
                                   radius: 12,
                                 ),
@@ -297,13 +302,15 @@ class _statState extends State<stat> {
                                   width: 5,
                                   height: 10,
                                 ),
-                                Text(
-                                  content[index].name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 15),
-                                ),
-                                const Spacer(),
                                 SizedBox(
-                                  width: 100,
+                                  width: 190,
+                                  child: Text(
+                                    content[index].name,
+                                    style: const TextStyle(color: Colors.white, fontSize: 15),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 50,
                                   child: Center(
                                     child: Text(
                                       value == "POINT"? content[index].answered.toString(): 
