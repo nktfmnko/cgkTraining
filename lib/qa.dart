@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:cgk/navigation.dart';
+import 'package:cgk/login.dart';
+import 'package:cgk/menu.dart';
 import 'package:cgk/select_questions.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vibration/vibration.dart';
 
@@ -55,14 +56,26 @@ class Training extends StatefulWidget {
 }
 
 final answered = <int>[];
-final moved = <int>{};
 int questionIndex = 0;
 int last = 1;
 double time = 0;
 
-
 String twoDigits(int n) {
   return n.toString().padLeft(2, '0');
+}
+
+Future<void> addValue<T>(T value, String collumn) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final data = await Supabase.instance.client
+        .from('users')
+        .select('email, $collumn')
+        .eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+    await Supabase.instance.client.from('users').update(
+        {'$collumn': data.last.values.last + value}).eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+  } on Exception {
+    throw new Exception('Ошибка');
+  }
 }
 
 class QuestionTimer extends StatefulWidget {
@@ -77,8 +90,8 @@ class QuestionTimer extends StatefulWidget {
 }
 
 class _QuestionTimerState extends State<QuestionTimer> {
-  Duration duration = Duration(seconds: 10);
-  Duration countDownDuration = Duration(seconds: 10);
+  Duration duration = Duration(seconds: 60);
+  Duration countDownDuration = Duration(seconds: 60);
   Timer? timer;
 
   @override
@@ -90,8 +103,8 @@ class _QuestionTimerState extends State<QuestionTimer> {
   void addTime() {
     final addSeconds = -1;
     final seconds = duration.inSeconds + addSeconds;
-    if (seconds == 3) {
-      Vibration.vibrate(duration: 700, amplitude: 128);
+    if (seconds == 10) {
+      vib! ? Vibration.vibrate(duration: 700, amplitude: 128) : null;
     }
     if (seconds < 0) {
       timer?.cancel();
@@ -99,7 +112,6 @@ class _QuestionTimerState extends State<QuestionTimer> {
       time += countDownDuration.inSeconds;
       if (questionIndex < widget.questions.length - 1) {
         questionIndex++;
-        moved.add(widget.questions[questionIndex].id);
       }
       widget.notifyParent();
       reset();
@@ -111,7 +123,7 @@ class _QuestionTimerState extends State<QuestionTimer> {
 
   void startTimer() {
     timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
-    AudioPlayer().play(AssetSource('startTimer.mp3'));
+    sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
   }
 
   void reset() {
@@ -125,11 +137,11 @@ class _QuestionTimerState extends State<QuestionTimer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff3987c8),
+      backgroundColor: const Color(0xff4397de),
       body: Center(
         child: Text(
           '${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}',
-          style: TextStyle(fontSize: 80),
+          style: TextStyle(fontSize: 80, color: Colors.white),
         ),
       ),
     );
@@ -142,15 +154,14 @@ class _TrainingState extends State<Training> {
   //чтение данных из бд
   Future<List<QA>> readData() async {
     final response = await Supabase.instance.client.from('questions').select();
-    if (response is! Object) throw Exception('результат равен null');
-    return response
+    return TypeCast(response)
         .safeCast<List<Object?>>()
-        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
           (e) => QA(
-            id: e['id'].safeCast<int>(),
-            question: e['question'].safeCast<String>(),
-            answer: e['answer'].safeCast<String>(),
+            id: TypeCast(e['id']).safeCast<int>(),
+            question: TypeCast(e['question']).safeCast<String>(),
+            answer: TypeCast(e['answer']).safeCast<String>(),
           ),
         )
         .toList();
@@ -162,9 +173,10 @@ class _TrainingState extends State<Training> {
       qaState.value = UnionState$Loading();
       final data = await readData();
       data.shuffle();
+      addValue(selected.toInt(), 'selectedQuestions');
       qaState.value = UnionState$Content(data.take(selected.toInt()).toList());
-    } on Exception {
-      qaState.value = UnionState$Error();
+    } on Exception catch (e) {
+      qaState.value = UnionState$Error(e);
     }
   }
 
@@ -187,7 +199,7 @@ class _TrainingState extends State<Training> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff3987c8),
+      backgroundColor: const Color(0xff4397de),
       body: ValueUnionStateListener<List<QA>>(
         unionListenable: qaState,
         contentBuilder: (content) {
@@ -227,15 +239,17 @@ class _TrainingState extends State<Training> {
                                   context: context,
                                   builder: (_) {
                                     return AlertDialog(
-                                      backgroundColor: Colors.blueGrey,
+                                      backgroundColor: Color(0xff4397de),
                                       content: SizedBox(
                                         height: 180,
                                         child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             SizedBox(
                                               child: ElevatedButton(
                                                 onPressed: () {
-                                                  Navigator.pop(context);
+                                                  Navigator.of(context, rootNavigator: true).pop();
                                                   globalKey.currentState!
                                                       .startTimer();
                                                   setState(() {});
@@ -243,7 +257,26 @@ class _TrainingState extends State<Training> {
                                                 child: Text(
                                                   "Продолжить",
                                                   style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll<
+                                                          Color>(
+                                                    Color(0xff3987C8),
+                                                  ),
+                                                  shape:
+                                                      MaterialStateProperty.all<
+                                                          RoundedRectangleBorder>(
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(8),
+                                                      ),
+                                                      side: BorderSide(
+                                                          color: Colors.black),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -259,21 +292,39 @@ class _TrainingState extends State<Training> {
                                                   last = 1;
                                                   questionIndex = 0;
                                                   selected = 1;
-                                                  moved.clear();
                                                   time = 0;
                                                   answered.clear();
                                                   Navigator.pushAndRemoveUntil(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const SelectQuestion(),
+                                                            const menu(),
                                                       ),
                                                       (route) => false);
                                                 },
                                                 child: Text(
                                                   "Домой",
                                                   style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll<
+                                                          Color>(
+                                                    Color(0xff3987C8),
+                                                  ),
+                                                  shape:
+                                                      MaterialStateProperty.all<
+                                                          RoundedRectangleBorder>(
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(8),
+                                                      ),
+                                                      side: BorderSide(
+                                                          color: Colors.black),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -291,12 +342,160 @@ class _TrainingState extends State<Training> {
                               icon: Icon(
                                 Icons.pause,
                                 size: 70,
-                                color: Colors.black,
+                                color: Colors.white,
                               ),
                             )
                           ],
                         ))
-                  : SizedBox.shrink(),
+                  : (last == content.length + 1
+                      ? SizedBox.shrink()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 9, right: 2),
+                              child: SizedBox(
+                                height: 40,
+                                width: 135,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                      const Color(0xff3987C8),
+                                    ),
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7),
+                                        side: const BorderSide(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (_) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            'Вы действительно хотите завершить тренировку?',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          backgroundColor: Color(0xff4397de),
+                                          content: SizedBox(
+                                            height: 180,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      addValue(answered.length,
+                                                          'rightAnswers');
+                                                      last = 1;
+                                                      questionIndex = 0;
+                                                      selected = 1;
+                                                      answered.clear();
+                                                      Navigator
+                                                          .pushAndRemoveUntil(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        const menu(),
+                                                              ),
+                                                              (route) => false);
+                                                    },
+                                                    child: Text(
+                                                      "Завершить",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStatePropertyAll<
+                                                              Color>(
+                                                        Color(0xff3987C8),
+                                                      ),
+                                                      shape: MaterialStateProperty
+                                                          .all<
+                                                              RoundedRectangleBorder>(
+                                                        RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(8),
+                                                          ),
+                                                          side: BorderSide(
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  width: 170,
+                                                  height: 50,
+                                                ),
+                                                SizedBox(
+                                                  height: 30,
+                                                ),
+                                                SizedBox(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context, rootNavigator: true).pop();
+                                                    },
+                                                    child: Text(
+                                                      "Продолжить",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStatePropertyAll<
+                                                              Color>(
+                                                        Color(0xff3987C8),
+                                                      ),
+                                                      shape: MaterialStateProperty
+                                                          .all<
+                                                              RoundedRectangleBorder>(
+                                                        RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(8),
+                                                          ),
+                                                          side: BorderSide(
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  width: 170,
+                                                  height: 50,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Text(
+                                    'Закончить тренировку',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        )),
               last == content.length + 1
                   ? SizedBox.shrink()
                   : SizedBox(
@@ -331,7 +530,7 @@ class _TrainingState extends State<Training> {
                               icon:
                                   const Icon(Icons.arrow_back_ios_new_rounded),
                               iconSize: 50,
-                              color: Colors.black45,
+                              color: Colors.black,
                             )),
                   last == content.length + 1
                       ? DecoratedBox(
@@ -341,6 +540,15 @@ class _TrainingState extends State<Training> {
                             borderRadius: BorderRadius.all(
                               Radius.circular(20),
                             ),
+                            gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: <Color>[
+                                  Color(0xff3987C7),
+                                  Color(0xff3A83C5),
+                                  Color(0xff3C78BD),
+                                  Color(0xff4067AF),
+                                ]),
                           ),
                           child: SizedBox(
                             height: 360,
@@ -354,30 +562,41 @@ class _TrainingState extends State<Training> {
                                     Text(
                                       'Всего вопросов: ${content.length}',
                                       style: TextStyle(
-                                        fontSize: 25,
-                                      ),
+                                          fontSize: 25, color: Colors.white),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
                                     ),
                                     Text(
                                       'Вопросов взято: ${answered.length}',
                                       style: TextStyle(
                                         fontSize: 25,
+                                        color: Colors.white,
                                       ),
                                     ),
+                                    timeGame
+                                        ? SizedBox(
+                                            height: 10,
+                                          )
+                                        : SizedBox.shrink(),
                                     timeGame
                                         ? Text(
                                             'Общее время: ${time}с',
                                             style: TextStyle(
-                                              fontSize: 25,
-                                            ),
+                                                fontSize: 25,
+                                                color: Colors.white),
                                           )
                                         : SizedBox.shrink(),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     ElevatedButton(
                                       style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all(
-                                                const Color(0xff418ecd)),
+                                                const Color(0xff3987C8)),
                                         shadowColor: MaterialStateProperty.all(
-                                            const Color(0xff418ecd)),
+                                            const Color(0xff3987C8)),
                                         overlayColor: MaterialStateProperty.all(
                                             Colors.black12),
                                         shape: MaterialStateProperty.all<
@@ -391,23 +610,31 @@ class _TrainingState extends State<Training> {
                                         ),
                                       ),
                                       onPressed: () {
+                                        addValue(
+                                            answered.length, 'rightAnswers');
+                                        timeGame
+                                            ? {
+                                                addValue(time, 'time'),
+                                                addValue(answered.length,
+                                                    'timeAnswered')
+                                              }
+                                            : null;
                                         last = 1;
                                         questionIndex = 0;
                                         selected = 1;
-                                        moved.clear();
                                         time = 0;
                                         answered.clear();
                                         Navigator.pushAndRemoveUntil(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  const SelectQuestion(),
+                                                  const menu(),
                                             ),
                                             (route) => false);
                                       },
                                       child: Text(
                                         'Домой',
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                     )
                                   ],
@@ -424,7 +651,15 @@ class _TrainingState extends State<Training> {
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black),
-                                color: const Color(0xbf418ecd),
+                                gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: <Color>[
+                                      Color(0xff3987C7),
+                                      Color(0xff3A83C5),
+                                      Color(0xff3C78BD),
+                                      Color(0xff4067AF),
+                                    ]),
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(20),
                                 ),
@@ -445,8 +680,9 @@ class _TrainingState extends State<Training> {
                                         content: Text(
                                           content[questionIndex].question,
                                           textAlign: TextAlign.center,
+                                          style: TextStyle(color: Colors.white),
                                         ),
-                                        backgroundColor: Colors.blueGrey,
+                                        backgroundColor: Color(0xff4397de),
                                       );
                                     },
                                   );
@@ -461,6 +697,7 @@ class _TrainingState extends State<Training> {
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontSize: 18,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -485,11 +722,10 @@ class _TrainingState extends State<Training> {
                                 } else {
                                   return;
                                 }
-                                moved.add(content[questionIndex].id);
                                 setState(() {});
                               },
                               icon: const Icon(Icons.arrow_forward_ios_rounded),
-                              color: Colors.black45,
+                              color: Colors.black,
                             ))
                 ],
               ),
@@ -502,9 +738,9 @@ class _TrainingState extends State<Training> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
-                                const Color(0xff418ecd)),
+                                const Color(0xff3987C8)),
                             shadowColor: MaterialStateProperty.all(
-                                const Color(0xff418ecd)),
+                                const Color(0xff3987C8)),
                             overlayColor:
                                 MaterialStateProperty.all(Colors.black12),
                             shape: MaterialStateProperty.all<
@@ -524,8 +760,9 @@ class _TrainingState extends State<Training> {
                                   content: Text(
                                     content[questionIndex].answer,
                                     textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                  backgroundColor: Colors.blueGrey,
+                                  backgroundColor: Color(0xff4397de),
                                 );
                               },
                             );
@@ -533,7 +770,7 @@ class _TrainingState extends State<Training> {
                           child: const Text(
                             'Ответ',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: Colors.white,
                               fontSize: 15,
                             ),
                           ),
@@ -568,8 +805,6 @@ class _TrainingState extends State<Training> {
                                                     : answered.add(
                                                         content[questionIndex]
                                                             .id);
-                                                moved.add(
-                                                    content[questionIndex].id);
                                                 questionIndex++;
                                                 last++;
                                                 time += globalKey
@@ -606,7 +841,8 @@ class _TrainingState extends State<Training> {
                                                   answered.add(
                                                       content[questionIndex]
                                                           .id);
-                                                  if(questionIndex != content.length-1){
+                                                  if (questionIndex !=
+                                                      content.length - 1) {
                                                     questionIndex++;
                                                   }
                                                   last++;
@@ -620,13 +856,13 @@ class _TrainingState extends State<Training> {
                                             ? MaterialStateProperty.all(
                                                 const Color(0xff235d8c))
                                             : MaterialStateProperty.all(
-                                                const Color(0xff418ecd)),
+                                                const Color(0xff3987C8)),
                                         shadowColor: answered.contains(
                                                 content[questionIndex].id)
                                             ? MaterialStateProperty.all(
                                                 const Color(0xff235d8c))
                                             : MaterialStateProperty.all(
-                                                const Color(0xff418ecd)),
+                                                const Color(0xff3987C8)),
                                         overlayColor: MaterialStateProperty.all(
                                             const Color(0xff235d8c)),
                                         shape: MaterialStateProperty.all<
@@ -642,7 +878,7 @@ class _TrainingState extends State<Training> {
                                       child: const Text(
                                         'Вопрос взят',
                                         style: TextStyle(
-                                          color: Colors.black,
+                                          color: Colors.white,
                                           fontSize: 18,
                                         ),
                                       ),
@@ -667,24 +903,27 @@ class _TrainingState extends State<Training> {
             ),
           );
         },
-        errorBuilder: () {
+        errorBuilder: (_) {
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Ошибка, перезагрузите страницу'),
+                const Text(
+                  'Ошибка, перезагрузите страницу',
+                  style: TextStyle(color: Colors.white),
+                ),
                 ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(const Color(0xff418ecd)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                     shadowColor:
-                        MaterialStateProperty.all(const Color(0xff418ecd)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                   ),
                   onPressed: () {
                     updateScreen();
                   },
                   child: const Text('Обновить',
-                      style: TextStyle(color: Colors.black)),
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
