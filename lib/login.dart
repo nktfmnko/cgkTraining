@@ -75,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> login() async {
     try {
+      setState(() {});
       final isFieldsValid = correctFields(
           mail: mailController.text, password: passwordController.text);
       if (!isFieldsValid) {
@@ -111,13 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
       pressForgot.value = !pressForgot.value;
-      SharedPreferences prefs = await SharedPreferences.getInstance();
       final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
       final password = await supabase
           .from('users')
           .select('password')
           .eq('email', '${forgotPasswordController.text}');
-      final response = await http.post(
+      await http.post(
         url,
         headers: {
           'origin': 'http://localhost',
@@ -318,7 +318,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                               Color>(
                                                           Color(0xff1b588c)),
                                                 ),
-                                                onPressed: sendEmail,
+                                                onPressed: pressForgot.value
+                                                    ? null
+                                                    : sendEmail,
                                                 child: ValueListenableBuilder<
                                                     bool>(
                                                   valueListenable: pressForgot,
@@ -355,7 +357,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                               Color>(
                                                           Color(0xff1b588c)),
                                                 ),
-                                                onPressed: sendEmail,
+                                                onPressed: pressForgot.value
+                                                    ? null
+                                                    : sendEmail,
                                                 child: ValueListenableBuilder<
                                                     bool>(
                                                   valueListenable: pressForgot,
@@ -399,7 +403,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         unionListenable: loginState,
                         contentBuilder: (_) {
                           return ElevatedButton(
-                            onPressed: login,
+                            onPressed: isPressState.value ? null : login,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isPressState,
                               builder: (_, isPress, __) {
@@ -438,7 +442,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               backgroundColor: MaterialStatePropertyAll<Color>(
                                   Color(0xff1b588c)),
                             ),
-                            onPressed: login,
+                            onPressed: isPressState.value ? null : login,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isPressState,
                               builder: (_, isPress, __) {

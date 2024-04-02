@@ -80,6 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> authorize() async {
     try {
+      setState(() {});
       final isFieldsValid = correctFields(
           mailController.text, passwordController.text, nameController.text);
       if (!isFieldsValid) {
@@ -89,8 +90,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       isPressState.value = !isPressState.value;
       final mailsList = await readMails();
       if (mailsList.contains(mailController.text)) {
-        registerState.error(
-            MessageException('Такой пользователь уже существует'));
+        registerState
+            .error(MessageException('Такой пользователь уже существует'));
         isPressState.value = !isPressState.value;
         return;
       }
@@ -257,7 +258,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               backgroundColor: MaterialStatePropertyAll<Color>(
                                   Color(0xff1b588c)),
                             ),
-                            onPressed: authorize,
+                            onPressed: isPressState.value ? null : authorize,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isPressState,
                               builder: (_, isPress, __) {
@@ -288,7 +289,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               backgroundColor: MaterialStatePropertyAll<Color>(
                                   Color(0xff1b588c)),
                             ),
-                            onPressed: authorize,
+                            onPressed: isPressState.value ? null : authorize,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isPressState,
                               builder: (_, isPress, __) {
