@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class StateTimer3Page extends StatefulWidget {
   const StateTimer3Page({Key? key}) : super(key: key);
@@ -118,30 +119,12 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                Positioned(
-                  bottom: 60,
-                  left: 17,
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.red,
-                    ),
-                  ),
+                SvgPicture.asset(
+                  'assets/Group 5.svg',
+                  alignment: Alignment.center,
+                  width: size.width * 0.35,
+                  height: size.height * 0.35,
                 ),
-                Positioned(
-                    bottom: 60,
-                    left: 225,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.red,
-                      ),
-                    )
-                )
               ],
             ),
             Row(

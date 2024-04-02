@@ -41,6 +41,7 @@ dependencies:
   vibration: ^1.8.4
   audioplayers: ^1.0.1
   flutter_svg: any
+  flutter_svg_provider: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,6 +76,9 @@ flutter:
      - assets/Group 1.svg
      - assets/Group 2.svg
      - assets/Group 3.svg
+     - assets/Group 4.svg
+     - assets/Group 5.svg
+     - assets/Group 6.svg
 
 
 
