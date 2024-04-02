@@ -90,8 +90,8 @@ class QuestionTimer extends StatefulWidget {
 }
 
 class _QuestionTimerState extends State<QuestionTimer> {
-  Duration duration = Duration(seconds: 10);
-  Duration countDownDuration = Duration(seconds: 10);
+  Duration duration = Duration(seconds: 60);
+  Duration countDownDuration = Duration(seconds: 60);
   Timer? timer;
 
   @override
@@ -103,8 +103,8 @@ class _QuestionTimerState extends State<QuestionTimer> {
   void addTime() {
     final addSeconds = -1;
     final seconds = duration.inSeconds + addSeconds;
-    if (seconds == 3) {
-      Vibration.vibrate(duration: 700, amplitude: 128);
+    if (seconds == 10) {
+      vib! ? Vibration.vibrate(duration: 700, amplitude: 128) : null;
     }
     if (seconds < 0) {
       timer?.cancel();
@@ -123,7 +123,7 @@ class _QuestionTimerState extends State<QuestionTimer> {
 
   void startTimer() {
     timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
-    AudioPlayer().play(AssetSource('startTimer.mp3'));
+    sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
   }
 
   void reset() {
@@ -249,7 +249,7 @@ class _TrainingState extends State<Training> {
                                             SizedBox(
                                               child: ElevatedButton(
                                                 onPressed: () {
-                                                  Navigator.pop(context);
+                                                  Navigator.of(context, rootNavigator: true).pop();
                                                   globalKey.currentState!
                                                       .startTimer();
                                                   setState(() {});
@@ -447,7 +447,7 @@ class _TrainingState extends State<Training> {
                                                 SizedBox(
                                                   child: ElevatedButton(
                                                     onPressed: () {
-                                                      Navigator.pop(context);
+                                                      Navigator.of(context, rootNavigator: true).pop();
                                                     },
                                                     child: Text(
                                                       "Продолжить",

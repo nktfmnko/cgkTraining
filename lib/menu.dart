@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cgk/changeQuestions.dart';
 import 'package:cgk/login.dart';
 import 'package:cgk/main.dart';
@@ -20,6 +19,12 @@ extension TypeCast<T> on T? {
     throw Exception('не удалось привести тип $runtimeType к типу $R');
   }
 }
+
+//Звук
+bool? sound = true;
+
+//Вибрация
+bool? vib = true;
 
 class userWithPic {
   final String name;
@@ -82,6 +87,8 @@ class _menu extends State<menu> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("remember");
     prefs.remove("mail");
+    prefs.remove('sound');
+    prefs.remove('vibration');
     rememberMe = false;
     Navigator.of(context, rootNavigator: true).pop();
     Navigator.pushAndRemoveUntil(
@@ -92,8 +99,21 @@ class _menu extends State<menu> {
         (route) => false);
   }
 
+  Future<void> soundSettings(bool s) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('sound', s);
+  }
+
+  Future<void> vibrationSettings(bool v) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('vibration', v);
+  }
+
   Future<void> updateScreen() async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      vib = prefs.getBool('vibration') == null ? true : prefs.getBool('vibration');
+      sound = prefs.getBool('sound') == null ? true : prefs.getBool('sound');
       menuState.value = UnionState$Loading();
       final data = await readUser();
       menuState.value = UnionState$Content(data);
@@ -124,7 +144,6 @@ class _menu extends State<menu> {
     }
   }
 
-
   @override
   void initState() {
     updateScreen();
@@ -141,10 +160,6 @@ class _menu extends State<menu> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    //Звук
-    bool? sound = true;
-    //Вибрация
-    bool? vib = true;
     return Scaffold(
       backgroundColor: const Color(0xff4397de),
       body: ValueUnionStateListener<userWithPic>(
@@ -237,13 +252,17 @@ class _menu extends State<menu> {
                                               width: 100,
                                               height: 100,
                                               child: InkWell(
-                                                radius: 50,
-                                                // изменение картинки профиля
-                                                onTap: () => takePicture(),
-                                                child: content.picture.isEmpty ? Image.asset("assets/avatar_image.png"): Image(
-                                                  fit: BoxFit.cover,
-                                                  image: NetworkImage(content.picture) ,
-                                              ))),
+                                                  radius: 50,
+                                                  // изменение картинки профиля
+                                                  onTap: () => takePicture(),
+                                                  child: content.picture.isEmpty
+                                                      ? Image.asset(
+                                                          "assets/avatar_image.png")
+                                                      : Image(
+                                                          fit: BoxFit.cover,
+                                                          image: NetworkImage(
+                                                              content.picture),
+                                                        ))),
                                           SizedBox(
                                             width: 10,
                                           ),
@@ -253,24 +272,30 @@ class _menu extends State<menu> {
                                             child: Align(
                                                 alignment: Alignment.center,
                                                 child: SingleChildScrollView(
-                                                    scrollDirection: Axis.horizontal,
-                                                      child : SizedBox(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: SizedBox(
                                                         width: 240,
-                                                          child: Text(content.name,
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 26))))),
+                                                        child: Text(
+                                                            content.name,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize:
+                                                                    26))))),
                                           ),
                                         ]),
                                         Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Text('Взятых вопросов: ${content.answered}',
+                                            child: Text(
+                                                'Взятых вопросов: ${content.answered}',
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 20))),
                                         Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Text('Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
+                                            child: Text(
+                                                'Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 20))),
@@ -282,40 +307,37 @@ class _menu extends State<menu> {
                                         Navigator.pop(context, 'Готово'),
                                     child: const Text('Готово',
                                         style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20)),
+                                            color: Colors.white, fontSize: 20)),
                                   ),
                                 ]),
                           ),
                           // implement the image with Ink.image
-                          child: content.picture.isEmpty ? Image.asset("assets/avatar_image.png"): Image(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(content.picture) ,
-                          ),
+                          child: content.picture.isEmpty
+                              ? Image.asset("assets/avatar_image.png")
+                              : Image(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(content.picture),
+                                ),
                         ),
                       ),
                       SizedBox(width: width / 20),
                       SizedBox(
-                        width: width * 32/60,
+                        width: width * 32 / 60,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: SizedBox(
-                            width: width * 40/60,
-                              child: Text(
-                          "${content.name}",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 23,
-                          ))),
+                              width: width * 40 / 60,
+                              child: Text("${content.name}",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 23,
+                                  ))),
+                        ),
                       ),
-                      ),
-                      SizedBox(
-                        width: width * 2/60
-                      )
+                      SizedBox(width: width * 2 / 60)
                     ],
                   ),
-              SizedBox(
-                height: height / 40),
+                  SizedBox(height: height / 40),
                   ElevatedButton(
                     style: ButtonStyle(
                       fixedSize: MaterialStateProperty.all(
@@ -489,6 +511,7 @@ class _menu extends State<menu> {
                                     onChanged: (newBool) {
                                       setState(() {
                                         sound = newBool;
+                                        soundSettings(newBool!);
                                       });
                                     },
                                   );
@@ -511,6 +534,7 @@ class _menu extends State<menu> {
                                     onChanged: (newBool) {
                                       setState(() {
                                         vib = newBool;
+                                        vibrationSettings(newBool!);
                                       });
                                     },
                                   );
