@@ -39,9 +39,10 @@ dependencies:
   percent_indicator: ^4.2.3
   email_validator: '^2.1.16'
   vibration: ^1.8.4
-  audioplayers: ^1.0.1
+  audioplayers: ^6.0.0
   shared_preferences: ^2.2.2
   image_picker: ^1.0.7
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:

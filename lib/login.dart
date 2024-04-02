@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/signup.dart';
@@ -6,6 +7,7 @@ import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 
 extension TypeCast<T> on T? {
   R safeCast<R>() {
@@ -39,9 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final obscureTextState = ValueNotifier<bool>(true);
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
+  final forgotPasswordController = TextEditingController();
+  final forgotState = UnionStateNotifier<void>(UnionState$Content(null));
   final loginState = UnionStateNotifier<void>(UnionState$Content(null));
   final supabase = Supabase.instance.client;
   final isPressState = ValueNotifier<bool>(false);
+  final pressForgot = ValueNotifier<bool>(false);
 
   Future<List<UserInfo>> readLogins() async {
     final response = await supabase.from('users').select('email, password');
@@ -96,6 +101,47 @@ class _LoginScreenState extends State<LoginScreen> {
     } on Exception {
       loginState.error(MessageException('Произошла ошибка, повторите'));
       isPressState.value = !isPressState.value;
+    }
+  }
+
+  Future<void> sendEmail() async {
+    try {
+      if (forgotPasswordController.text.isEmpty) {
+        forgotState.error(MessageException('Поле неверно заполнено'));
+        return;
+      }
+      pressForgot.value = !pressForgot.value;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+      final password = await supabase
+          .from('users')
+          .select('password')
+          .eq('email', '${forgotPasswordController.text}');
+      final response = await http.post(
+        url,
+        headers: {
+          'origin': 'http://localhost',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
+            'service_id': 'service_23bd6wb',
+            'template_id': 'template_8hairan',
+            'user_id': 'RK2JAm99g7P7VusxQ',
+            'template_params': {
+              'to_email': '${forgotPasswordController.text}',
+              'message': '${password}',
+            }
+          },
+        ),
+      );
+      pressForgot.value = !pressForgot.value;
+      forgotState.value = UnionState$Content(null);
+      forgotPasswordController.text = "";
+      Navigator.of(context, rootNavigator: true).pop();
+    } on Exception {
+      forgotState.error(MessageException('Произошла ошибка, повторите'));
+      pressForgot.value = !pressForgot.value;
     }
   }
 
@@ -220,7 +266,125 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Align(
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: Color(0xff4397de),
+                                    title: Text(
+                                      'Введите почту',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    content: SizedBox(
+                                      height: 150,
+                                      width: 300,
+                                      child: Column(
+                                        children: [
+                                          TextFormField(
+                                            cursorColor: Colors.white,
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            controller:
+                                                forgotPasswordController,
+                                            keyboardType:
+                                                TextInputType.emailAddress,
+                                            decoration: InputDecoration(
+                                              labelText: 'Почта',
+                                              labelStyle: TextStyle(
+                                                  color: Colors.white),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black,
+                                                    width: 1.5),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black,
+                                                    width: 1.5),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          ValueUnionStateListener<void>(
+                                            unionListenable: forgotState,
+                                            contentBuilder: (_) {
+                                              return ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll<
+                                                              Color>(
+                                                          Color(0xff1b588c)),
+                                                ),
+                                                onPressed: sendEmail,
+                                                child: ValueListenableBuilder<
+                                                    bool>(
+                                                  valueListenable: pressForgot,
+                                                  builder: (_, isPress, __) {
+                                                    return isPress
+                                                        ? CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                          )
+                                                        : Text(
+                                                            'Отправить пароль',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 17),
+                                                          );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            loadingBuilder: () {
+                                              return ElevatedButton(
+                                                onPressed: null,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder: (exception) {
+                                              return ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll<
+                                                              Color>(
+                                                          Color(0xff1b588c)),
+                                                ),
+                                                onPressed: sendEmail,
+                                                child: ValueListenableBuilder<
+                                                    bool>(
+                                                  valueListenable: pressForgot,
+                                                  builder: (_, isPress, __) {
+                                                    return isPress
+                                                        ? CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                          )
+                                                        : Text(
+                                                            exception
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ).then((value) {
+                                forgotState.value = UnionState$Content(null);
+                              });
+                            },
                             child: Text(
                               'Забыли пароль?',
                               style: TextStyle(color: Colors.white),
