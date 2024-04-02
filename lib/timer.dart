@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:cgk/timer1.dart';
 import 'package:cgk/timer2.dart';
 import 'package:cgk/timer3.dart';
@@ -20,7 +19,8 @@ class StateTimerPage extends StatelessWidget {
               appBar: AppBar(
                 backgroundColor: const Color(0xff4397de),
                 centerTitle: true,
-                title: const Text("Timers"),
+                title: const Text("Таймеры"),
+                automaticallyImplyLeading: false,
                 bottom: TabBar(
                     indicatorColor: const Color(0xff418ecd),
                     padding: EdgeInsets.all(1),

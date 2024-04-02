@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cgk/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -43,7 +44,7 @@ class _StateTimer1PageState extends State<StateTimer1Page> {
         if (_waitTime <= 0) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text('Finished')));
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         }
       });

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cgk/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -43,13 +44,13 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
         if (_waitTime <= 0) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text('Finished')));
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         } else if (_waitTime == 20) {
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         } else if (_waitTime == 40) {
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         }
       });
@@ -66,7 +67,7 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
   void pause() {
     _timer?.cancel();
     setState(
-          () {
+      () {
         isStart = false;
       },
     );
@@ -136,29 +137,29 @@ class _StateTimer3PageState extends State<StateTimer3Page> {
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
-                      heroTag: "btn1",
+                      heroTag: "btn5",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         isStart ? pause() : start(context);
                       },
                       child: isStart
                           ? const Icon(
-                        Icons.pause,
-                        size: 80,
-                        color: Color(0xff235d8c),
-                      )
+                              Icons.pause,
+                              size: 80,
+                              color: Color(0xff235d8c),
+                            )
                           : const Icon(
-                        Icons.play_arrow_outlined,
-                        size: 80,
-                        color: Color(0xff235d8c),
-                      )),
+                              Icons.play_arrow_outlined,
+                              size: 80,
+                              color: Color(0xff235d8c),
+                            )),
                 ),
                 Container(
                   height: size.height * 0.15,
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
-                      heroTag: "btn2",
+                      heroTag: "btn6",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         restart();

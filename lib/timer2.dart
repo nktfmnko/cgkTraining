@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cgk/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -43,10 +44,10 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
         if (_waitTime <= 0) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text('Finished')));
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         } else if (_waitTime == 30) {
-          AudioPlayer().play(AssetSource('startTimer.mp3'));
+          sound! ? AudioPlayer().play(AssetSource('startTimer.mp3')) : null;
           pause();
         }
       });
@@ -128,7 +129,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
-                      heroTag: "btn1",
+                      heroTag: "btn3",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         isStart ? pause() : start(context);
@@ -150,7 +151,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
                   width: size.height * 0.15,
                   margin: const EdgeInsets.all(20),
                   child: FloatingActionButton(
-                      heroTag: "btn2",
+                      heroTag: "btn4",
                       backgroundColor: const Color(0xff418ecd),
                       onPressed: () {
                         restart();
