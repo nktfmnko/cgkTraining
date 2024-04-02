@@ -239,6 +239,7 @@ class _menu extends State<menu> {
                           radius: 100,
                           // display a snackbar on tap
                           onTap: () => showDialog<String>(
+                            barrierDismissible: false,
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
                                 backgroundColor: Color(0xff4397de),
