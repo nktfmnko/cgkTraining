@@ -36,5 +36,6 @@
 - Аккаунт администратора(admin admin), где реализованы добавление и удаление вопросов
   
 Вопросы взяты из открытой [базы вопросов ЧГК](https://db.chgk.info/)
+
 [Ссылка](https://www.figma.com/file/KbnD2lkSnDIXKaCmrNil0W/Untitled?type=design&node-id=0-1&mode=design&t=3uX4emUu0RUKxezj-0) на дизайн в Figma
 
