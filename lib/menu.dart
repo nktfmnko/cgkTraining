@@ -112,7 +112,9 @@ class _menu extends State<menu> {
   Future<void> updateScreen() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      vib = prefs.getBool('vibration') == null ? true : prefs.getBool('vibration');
+      vib = prefs.getBool('vibration') == null
+          ? true
+          : prefs.getBool('vibration');
       sound = prefs.getBool('sound') == null ? true : prefs.getBool('sound');
       menuState.value = UnionState$Loading();
       final data = await readUser();
@@ -135,8 +137,8 @@ class _menu extends State<menu> {
       await Supabase.instance.client.from('users').update({
         'picture':
             '${await Supabase.instance.client.storage.from('pictures').getPublicUrl('${image?.path}')}'
-      }).eq('email',
-          '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+      }).eq(
+          'email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
       updateScreen();
     } on Exception catch (e) {
       throw new Exception(e);
@@ -178,394 +180,420 @@ class _menu extends State<menu> {
         },
         contentBuilder: (content) {
           return SafeArea(
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      color: Colors.white70,
-                      icon: Icon(
-                        Icons.exit_to_app,
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: Color(0xff4397de),
-                              title: Text(
-                                'Вы уверены, что хотите выйти?',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              content: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: exit,
-                                    child: Text(
-                                      'Да',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      'Нет',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(width: width / 20),
-                      //вместо иконки
-                      SizedBox(
-                        width: width * 1 / 3,
-                        height: width * 1 / 3,
-                        // Inkwell
-                        child: InkWell(
-                          radius: 100,
-                          // display a snackbar on tap
-                          onTap: () => showDialog<String>(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                                backgroundColor: Color(0xff4397de),
-                                content: new SizedBox(
-                                    height: height * 22 / 100,
-                                    width: width / 5,
-                                    child: Column(
-                                      children: [
-                                        Row(children: [
-                                          SizedBox(
-                                              width: 100,
-                                              height: 100,
-                                              child: InkWell(
-                                                  radius: 50,
-                                                  // изменение картинки профиля
-                                                  onTap: () => takePicture(),
-                                                  child: content.picture.isEmpty
-                                                      ? Image.asset(
-                                                          "assets/avatar_image.png")
-                                                      : Image(
-                                                          fit: BoxFit.cover,
-                                                          image: NetworkImage(
-                                                              content.picture),
-                                                        ))),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          SizedBox(
-                                            height: 100,
-                                            width: 120,
-                                            child: Align(
-                                                alignment: Alignment.center,
-                                                child: SingleChildScrollView(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: SizedBox(
-                                                        width: 240,
-                                                        child: Text(
-                                                            content.name,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize:
-                                                                    26))))),
-                                          ),
-                                        ]),
-                                        Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                                'Взятых вопросов: ${content.answered}',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20))),
-                                        Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                                'Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20))),
-                                      ],
-                                    )),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Готово'),
-                                    child: const Text('Готово',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20)),
-                                  ),
-                                ]),
+            child: RefreshIndicator(
+              color: Colors.blueGrey,
+              onRefresh: () async {
+                await Future.delayed(
+                  Duration(seconds: 1),
+                );
+                return updateScreen();
+              },
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Center(
+                  child: Column(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          color: Colors.white70,
+                          icon: Icon(
+                            Icons.exit_to_app,
                           ),
-                          // implement the image with Ink.image
-                          child: content.picture.isEmpty
-                              ? Image.asset("assets/avatar_image.png")
-                              : Image(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(content.picture),
-                                ),
-                        ),
-                      ),
-                      SizedBox(width: width / 20),
-                      SizedBox(
-                        width: width * 32 / 60,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: SizedBox(
-                              width: width * 40 / 60,
-                              child: Text("${content.name}",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 23,
-                                  ))),
-                        ),
-                      ),
-                      SizedBox(width: width * 2 / 60)
-                    ],
-                  ),
-                  SizedBox(height: height / 40),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      fixedSize: MaterialStateProperty.all(
-                          Size(8 / 9 * width, 1 / 12 * height)),
-                      backgroundColor: MaterialStateProperty.all(
-                          Color.fromRGBO(57, 135, 200, 1)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side:
-                              const BorderSide(width: 1.5, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SelectQuestion()),
-                      );
-                    },
-                    child: Text(
-                      'Играть',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1 / 20 * height),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      fixedSize: MaterialStateProperty.all(
-                          Size(8 / 9 * width, 1 / 12 * height)),
-                      backgroundColor: MaterialStateProperty.all(
-                          Color.fromRGBO(57, 135, 200, 1)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side:
-                              const BorderSide(width: 1.5, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => stat()),
-                      );
-                    },
-                    child: Text(
-                      'Статистика',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1 / 20 * height),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      fixedSize: MaterialStateProperty.all(
-                          Size(8 / 9 * width, 1 / 12 * height)),
-                      backgroundColor: MaterialStateProperty.all(
-                          Color.fromRGBO(57, 135, 200, 1)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side:
-                              const BorderSide(width: 1.5, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => StateTimerPage()),
-                      );
-                    },
-                    child: Text(
-                      'Таймер',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1 / 20 * height),
-                  content.admin
-                      ? Column(
-                          children: <Widget>[
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                fixedSize: MaterialStateProperty.all(
-                                    Size(8 / 9 * width, 1 / 12 * height)),
-                                backgroundColor: MaterialStateProperty.all(
-                                    Color.fromRGBO(57, 135, 200, 1)),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: const BorderSide(
-                                        width: 1.5, color: Colors.black),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Color(0xff4397de),
+                                  title: Text(
+                                    'Вы уверены, что хотите выйти?',
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => adminChange(),
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton(
+                                        onPressed: exit,
+                                        child: Text(
+                                          'Да',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          'Нет',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 );
                               },
-                              child: Text(
-                                'Добавить вопрос',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 1 / 20 * height),
-                          ],
-                        )
-                      : SizedBox.shrink(),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      fixedSize: MaterialStateProperty.all(
-                          Size(8 / 9 * width, 1 / 12 * height)),
-                      backgroundColor: MaterialStateProperty.all(
-                          Color.fromRGBO(57, 135, 200, 1)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side:
-                              const BorderSide(width: 1.5, color: Colors.black),
+                            );
+                          },
                         ),
                       ),
-                    ),
-                    onPressed: () {
-                      showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          backgroundColor: Color(0xff4397de),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side:
-                                  BorderSide(width: 1.5, color: Colors.black)),
-                          content: SizedBox(
-                            width: 3 / 4 * width,
-                            height: 1 / 7 * height,
-                            child: Column(
-                              children: [
-                                StatefulBuilder(builder: (BuildContext context,
-                                    StateSetter setState) {
-                                  return CheckboxListTile(
-                                    checkColor: Colors.white,
-                                    activeColor: Colors.black,
-                                    side: BorderSide(
-                                        width: 1.5, color: Colors.black),
-                                    title: Text(
-                                      'Звук',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 27,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(width: width / 20),
+                          //вместо иконки
+                          SizedBox(
+                            width: width * 1 / 3,
+                            height: width * 1 / 3,
+                            // Inkwell
+                            child: InkWell(
+                              radius: 100,
+                              // display a snackbar on tap
+                              onTap: () => showDialog<String>(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                    backgroundColor: Color(0xff4397de),
+                                    content: new SizedBox(
+                                        height: height * 22 / 100,
+                                        width: width / 5,
+                                        child: Column(
+                                          children: [
+                                            Row(children: [
+                                              SizedBox(
+                                                  width: 100,
+                                                  height: 100,
+                                                  child: InkWell(
+                                                      radius: 50,
+                                                      // изменение картинки профиля
+                                                      onTap: () =>
+                                                          takePicture(),
+                                                      child: content
+                                                              .picture.isEmpty
+                                                          ? Image.asset(
+                                                              "assets/avatar_image.png")
+                                                          : Image(
+                                                              fit: BoxFit.cover,
+                                                              image: NetworkImage(
+                                                                  content
+                                                                      .picture),
+                                                            ))),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              SizedBox(
+                                                height: 100,
+                                                width: 120,
+                                                child: Align(
+                                                    alignment: Alignment.center,
+                                                    child: SingleChildScrollView(
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        child: SizedBox(
+                                                            width: 240,
+                                                            child: Text(
+                                                                content.name,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        26))))),
+                                              ),
+                                            ]),
+                                            Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                    'Взятых вопросов: ${content.answered}',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20))),
+                                            Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                    'Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20))),
+                                          ],
+                                        )),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'Готово'),
+                                        child: const Text('Готово',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20)),
                                       ),
+                                    ]),
+                              ),
+                              // implement the image with Ink.image
+                              child: content.picture.isEmpty
+                                  ? Image.asset("assets/avatar_image.png")
+                                  : Image(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(content.picture),
                                     ),
-                                    value: sound,
-                                    onChanged: (newBool) {
-                                      setState(() {
-                                        sound = newBool;
-                                        soundSettings(newBool!);
-                                      });
-                                    },
-                                  );
-                                }),
-                                StatefulBuilder(builder: (BuildContext context,
-                                    StateSetter setState) {
-                                  return CheckboxListTile(
-                                    checkColor: Colors.white,
-                                    activeColor: Colors.black,
-                                    side: BorderSide(
-                                        width: 1.5, color: Colors.black),
-                                    title: Text(
-                                      'Вибрация',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 27,
-                                      ),
-                                    ),
-                                    value: vib,
-                                    onChanged: (newBool) {
-                                      setState(() {
-                                        vib = newBool;
-                                        vibrationSettings(newBool!);
-                                      });
-                                    },
-                                  );
-                                }),
-                              ],
                             ),
                           ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, 'Назад'),
-                              child: Text(
-                                'Назад',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: width / height * 40,
+                          SizedBox(width: width / 20),
+                          SizedBox(
+                            width: width * 32 / 60,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: SizedBox(
+                                  width: width * 40 / 60,
+                                  child: Text("${content.name}",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 23,
+                                      ))),
+                            ),
+                          ),
+                          SizedBox(width: width * 2 / 60)
+                        ],
+                      ),
+                      SizedBox(height: height / 40),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              Size(8 / 9 * width, 1 / 12 * height)),
+                          backgroundColor: MaterialStateProperty.all(
+                              Color.fromRGBO(57, 135, 200, 1)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  width: 1.5, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SelectQuestion()),
+                          );
+                        },
+                        child: Text(
+                          'Играть',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 1 / 20 * height),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              Size(8 / 9 * width, 1 / 12 * height)),
+                          backgroundColor: MaterialStateProperty.all(
+                              Color.fromRGBO(57, 135, 200, 1)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  width: 1.5, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => stat()),
+                          );
+                        },
+                        child: Text(
+                          'Статистика',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 1 / 20 * height),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              Size(8 / 9 * width, 1 / 12 * height)),
+                          backgroundColor: MaterialStateProperty.all(
+                              Color.fromRGBO(57, 135, 200, 1)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  width: 1.5, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StateTimerPage()),
+                          );
+                        },
+                        child: Text(
+                          'Таймер',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 1 / 20 * height),
+                      content.admin
+                          ? Column(
+                              children: <Widget>[
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    fixedSize: MaterialStateProperty.all(
+                                        Size(8 / 9 * width, 1 / 12 * height)),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Color.fromRGBO(57, 135, 200, 1)),
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: const BorderSide(
+                                            width: 1.5, color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => adminChange(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Добавить вопрос',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 1 / 20 * height),
+                              ],
+                            )
+                          : SizedBox.shrink(),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStateProperty.all(
+                              Size(8 / 9 * width, 1 / 12 * height)),
+                          backgroundColor: MaterialStateProperty.all(
+                              Color.fromRGBO(57, 135, 200, 1)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  width: 1.5, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              backgroundColor: Color(0xff4397de),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(
+                                      width: 1.5, color: Colors.black)),
+                              content: SizedBox(
+                                width: 3 / 4 * width,
+                                height: 1 / 7 * height,
+                                child: Column(
+                                  children: [
+                                    StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      return CheckboxListTile(
+                                        checkColor: Colors.white,
+                                        activeColor: Colors.black,
+                                        side: BorderSide(
+                                            width: 1.5, color: Colors.black),
+                                        title: Text(
+                                          'Звук',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 27,
+                                          ),
+                                        ),
+                                        value: sound,
+                                        onChanged: (newBool) {
+                                          setState(() {
+                                            sound = newBool;
+                                            soundSettings(newBool!);
+                                          });
+                                        },
+                                      );
+                                    }),
+                                    StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      return CheckboxListTile(
+                                        checkColor: Colors.white,
+                                        activeColor: Colors.black,
+                                        side: BorderSide(
+                                            width: 1.5, color: Colors.black),
+                                        title: Text(
+                                          'Вибрация',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 27,
+                                          ),
+                                        ),
+                                        value: vib,
+                                        onChanged: (newBool) {
+                                          setState(() {
+                                            vib = newBool;
+                                            vibrationSettings(newBool!);
+                                          });
+                                        },
+                                      );
+                                    }),
+                                  ],
                                 ),
                               ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Назад'),
+                                  child: Text(
+                                    'Назад',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: width / height * 40,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          );
+                        },
+                        child: Text(
+                          'Настройки',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          ),
                         ),
-                      );
-                    },
-                    child: Text(
-                      'Настройки',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
                       ),
-                    ),
+                      SizedBox(
+                        height: 1 / 20 * height,
+                      )
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           );
