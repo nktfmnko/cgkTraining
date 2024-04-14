@@ -148,7 +148,7 @@ class _QuestionTimerState extends State<QuestionTimer> {
   }
 }
 
-class _TrainingState extends State<Training> {
+class _TrainingState extends State<Training> with WidgetsBindingObserver{
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
 
   //чтение данных из бд
@@ -183,13 +183,125 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     updateScreen();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
     qaState.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if(state == AppLifecycleState.paused && timeGame && globalKey.currentState!.timer!.isActive){
+      globalKey.currentState!.timer?.cancel();
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            backgroundColor: Color(0xff4397de),
+            content: SizedBox(
+              height: 180,
+              child: Column(
+                mainAxisAlignment:
+                MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        globalKey.currentState!
+                            .startTimer();
+                        setState(() {});
+                      },
+                      child: Text(
+                        "Продолжить",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStatePropertyAll<
+                            Color>(
+                          Color(0xff3987C8),
+                        ),
+                        shape:
+                        MaterialStateProperty.all<
+                            RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                            side: BorderSide(
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                    width: 170,
+                    height: 50,
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        last = 1;
+                        questionIndex = 0;
+                        selected = 1;
+                        time = 0;
+                        answered.clear();
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                              const menu(),
+                            ),
+                                (route) => false);
+                      },
+                      child: Text(
+                        "Домой",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStatePropertyAll<
+                            Color>(
+                          Color(0xff3987C8),
+                        ),
+                        shape:
+                        MaterialStateProperty.all<
+                            RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                            side: BorderSide(
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                    width: 170,
+                    height: 50,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   void refresh() {
@@ -219,679 +331,678 @@ class _TrainingState extends State<Training> {
               ),
             );
           }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                height: 10,
-              ),
-              timeGame
-                  ? (last == content.length + 1
-                      ? SizedBox.shrink()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                globalKey.currentState!.timer?.cancel();
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (_) {
-                                    return AlertDialog(
-                                      backgroundColor: Color(0xff4397de),
-                                      content: SizedBox(
-                                        height: 180,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context, rootNavigator: true).pop();
-                                                  globalKey.currentState!
-                                                      .startTimer();
-                                                  setState(() {});
-                                                },
-                                                child: Text(
-                                                  "Продолжить",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
+          return SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                timeGame
+                    ? (last == content.length + 1
+                        ? SizedBox.shrink()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  globalKey.currentState!.timer?.cancel();
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) {
+                                      return AlertDialog(
+                                        backgroundColor: Color(0xff4397de),
+                                        content: SizedBox(
+                                          height: 180,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context, rootNavigator: true).pop();
+                                                    globalKey.currentState!
+                                                        .startTimer();
+                                                    setState(() {});
+                                                  },
+                                                  child: Text(
+                                                    "Продолжить",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
-                                                ),
-                                                style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll<
-                                                          Color>(
-                                                    Color(0xff3987C8),
-                                                  ),
-                                                  shape:
-                                                      MaterialStateProperty.all<
-                                                          RoundedRectangleBorder>(
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(8),
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll<
+                                                            Color>(
+                                                      Color(0xff3987C8),
+                                                    ),
+                                                    shape:
+                                                        MaterialStateProperty.all<
+                                                            RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(8),
+                                                        ),
+                                                        side: BorderSide(
+                                                            color: Colors.black),
                                                       ),
-                                                      side: BorderSide(
-                                                          color: Colors.black),
                                                     ),
                                                   ),
                                                 ),
+                                                width: 170,
+                                                height: 50,
                                               ),
-                                              width: 170,
-                                              height: 50,
-                                            ),
-                                            SizedBox(
-                                              height: 30,
-                                            ),
-                                            SizedBox(
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  last = 1;
-                                                  questionIndex = 0;
-                                                  selected = 1;
-                                                  time = 0;
-                                                  answered.clear();
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const menu(),
-                                                      ),
-                                                      (route) => false);
-                                                },
-                                                child: Text(
-                                                  "Домой",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
+                                              SizedBox(
+                                                height: 30,
+                                              ),
+                                              SizedBox(
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    last = 1;
+                                                    questionIndex = 0;
+                                                    selected = 1;
+                                                    time = 0;
+                                                    answered.clear();
+                                                    Navigator.pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const menu(),
+                                                        ),
+                                                        (route) => false);
+                                                  },
+                                                  child: Text(
+                                                    "Домой",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
-                                                ),
-                                                style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll<
-                                                          Color>(
-                                                    Color(0xff3987C8),
-                                                  ),
-                                                  shape:
-                                                      MaterialStateProperty.all<
-                                                          RoundedRectangleBorder>(
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(8),
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll<
+                                                            Color>(
+                                                      Color(0xff3987C8),
+                                                    ),
+                                                    shape:
+                                                        MaterialStateProperty.all<
+                                                            RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(8),
+                                                        ),
+                                                        side: BorderSide(
+                                                            color: Colors.black),
                                                       ),
-                                                      side: BorderSide(
-                                                          color: Colors.black),
                                                     ),
                                                   ),
                                                 ),
+                                                width: 170,
+                                                height: 50,
                                               ),
-                                              width: 170,
-                                              height: 50,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  setState(() {});
+                                },
+                                icon: Icon(
+                                  Icons.pause,
+                                  size: 55,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ))
+                    : (last == content.length + 1
+                        ? SizedBox.shrink()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 9, right: 2),
+                                child: SizedBox(
+                                  height: 40,
+                                  width: 135,
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xff3987C8),
+                                      ),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(7),
+                                          side: const BorderSide(
+                                              color: Colors.black),
                                         ),
                                       ),
-                                    );
-                                  },
-                                );
-                                setState(() {});
-                              },
-                              icon: Icon(
-                                Icons.pause,
-                                size: 70,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ))
-                  : (last == content.length + 1
-                      ? SizedBox.shrink()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 9, right: 2),
-                              child: SizedBox(
-                                height: 40,
-                                width: 135,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                      const Color(0xff3987C8),
                                     ),
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(7),
-                                        side: const BorderSide(
-                                            color: Colors.black),
-                                      ),
+                                    onPressed: () {
+                                      showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (_) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              'Вы действительно хотите завершить тренировку?',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.white,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            backgroundColor: Color(0xff4397de),
+                                            content: SizedBox(
+                                              height: 180,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        addValue(answered.length,
+                                                            'rightAnswers');
+                                                        last = 1;
+                                                        questionIndex = 0;
+                                                        selected = 1;
+                                                        answered.clear();
+                                                        Navigator
+                                                            .pushAndRemoveUntil(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const menu(),
+                                                                ),
+                                                                (route) => false);
+                                                      },
+                                                      child: Text(
+                                                        "Завершить",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      style: ButtonStyle(
+                                                        backgroundColor:
+                                                            MaterialStatePropertyAll<
+                                                                Color>(
+                                                          Color(0xff3987C8),
+                                                        ),
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                              Radius.circular(8),
+                                                            ),
+                                                            side: BorderSide(
+                                                                color:
+                                                                    Colors.black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    width: 170,
+                                                    height: 50,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 30,
+                                                  ),
+                                                  SizedBox(
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context, rootNavigator: true).pop();
+                                                      },
+                                                      child: Text(
+                                                        "Продолжить",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      style: ButtonStyle(
+                                                        backgroundColor:
+                                                            MaterialStatePropertyAll<
+                                                                Color>(
+                                                          Color(0xff3987C8),
+                                                        ),
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                              Radius.circular(8),
+                                                            ),
+                                                            side: BorderSide(
+                                                                color:
+                                                                    Colors.black),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    width: 170,
+                                                    height: 50,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      'Закончить тренировку',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
-                                  onPressed: () {
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (_) {
-                                        return AlertDialog(
-                                          title: Text(
-                                            'Вы действительно хотите завершить тренировку?',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white,
+                                ),
+                              )
+                            ],
+                          )),
+                last == content.length + 1
+                    ? SizedBox.shrink()
+                    : SizedBox(
+                        height: 130,
+                        child: timeGame
+                            ? QuestionTimer(
+                                notifyParent: refresh,
+                                questions: content,
+                                key: globalKey)
+                            : SizedBox.shrink(),
+                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    timeGame || last == content.length + 1
+                        ? SizedBox(
+                            width: 60,
+                          )
+                        : (questionIndex == 0
+                            ? SizedBox(
+                                width: 66,
+                              )
+                            : IconButton(
+                                onPressed: () {
+                                  if (questionIndex != 0) {
+                                    questionIndex--;
+                                  } else {
+                                    return;
+                                  }
+                                  setState(() {});
+                                },
+                                icon:
+                                    const Icon(Icons.arrow_back_ios_new_rounded),
+                                iconSize: 50,
+                                color: Colors.black,
+                              )),
+                    last == content.length + 1
+                        ? DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20),
+                              ),
+                              gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: <Color>[
+                                    Color(0xff3987C7),
+                                    Color(0xff3A83C5),
+                                    Color(0xff3C78BD),
+                                    Color(0xff4067AF),
+                                  ]),
+                            ),
+                            child: SizedBox(
+                              height: 360,
+                              width: 270,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 5),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Всего вопросов: ${content.length}',
+                                        style: TextStyle(
+                                            fontSize: 25, color: Colors.white),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        'Вопросов взято: ${answered.length}',
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      timeGame
+                                          ? SizedBox(
+                                              height: 10,
+                                            )
+                                          : SizedBox.shrink(),
+                                      timeGame
+                                          ? Text(
+                                              'Общее время: ${time}с',
+                                              style: TextStyle(
+                                                  fontSize: 25,
+                                                  color: Colors.white),
+                                            )
+                                          : SizedBox.shrink(),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  const Color(0xff3987C8)),
+                                          shadowColor: MaterialStateProperty.all(
+                                              const Color(0xff3987C8)),
+                                          overlayColor: MaterialStateProperty.all(
+                                              Colors.black12),
+                                          shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              side: const BorderSide(
+                                                  color: Colors.black),
                                             ),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          addValue(
+                                              answered.length, 'rightAnswers');
+                                          timeGame
+                                              ? {
+                                                  addValue(time, 'time'),
+                                                  addValue(answered.length,
+                                                      'timeAnswered')
+                                                }
+                                              : null;
+                                          last = 1;
+                                          questionIndex = 0;
+                                          selected = 1;
+                                          time = 0;
+                                          answered.clear();
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const menu(),
+                                              ),
+                                              (route) => false);
+                                        },
+                                        child: Text(
+                                          'Домой',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : Expanded(
+                            flex: 1,
+                            child: SizedBox(
+                              height: 300,
+                              width: 220,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: <Color>[
+                                        Color(0xff3987C7),
+                                        Color(0xff3A83C5),
+                                        Color(0xff3C78BD),
+                                        Color(0xff4067AF),
+                                      ]),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                ),
+                                child: InkWell(
+                                  highlightColor: Colors.black38,
+                                  splashColor: Colors.black26,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  onLongPress: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext builder) {
+                                        return AlertDialog(
+                                          contentPadding:
+                                              const EdgeInsets.all(24),
+                                          content: Text(
+                                            content[questionIndex].question,
                                             textAlign: TextAlign.center,
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                           backgroundColor: Color(0xff4397de),
-                                          content: SizedBox(
-                                            height: 180,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      addValue(answered.length,
-                                                          'rightAnswers');
-                                                      last = 1;
-                                                      questionIndex = 0;
-                                                      selected = 1;
-                                                      answered.clear();
-                                                      Navigator
-                                                          .pushAndRemoveUntil(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const menu(),
-                                                              ),
-                                                              (route) => false);
-                                                    },
-                                                    child: Text(
-                                                      "Завершить",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStatePropertyAll<
-                                                              Color>(
-                                                        Color(0xff3987C8),
-                                                      ),
-                                                      shape: MaterialStateProperty
-                                                          .all<
-                                                              RoundedRectangleBorder>(
-                                                        RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(8),
-                                                          ),
-                                                          side: BorderSide(
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  width: 170,
-                                                  height: 50,
-                                                ),
-                                                SizedBox(
-                                                  height: 30,
-                                                ),
-                                                SizedBox(
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context, rootNavigator: true).pop();
-                                                    },
-                                                    child: Text(
-                                                      "Продолжить",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStatePropertyAll<
-                                                              Color>(
-                                                        Color(0xff3987C8),
-                                                      ),
-                                                      shape: MaterialStateProperty
-                                                          .all<
-                                                              RoundedRectangleBorder>(
-                                                        RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(8),
-                                                          ),
-                                                          side: BorderSide(
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  width: 170,
-                                                  height: 50,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                         );
                                       },
                                     );
                                   },
-                                  child: Text(
-                                    'Закончить тренировку',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.white),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SingleChildScrollView(
+                                      key: ValueKey(questionIndex),
+                                      scrollDirection: Axis.vertical,
+                                      child: Text(
+                                        content[questionIndex].question,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            )
-                          ],
-                        )),
-              last == content.length + 1
-                  ? SizedBox.shrink()
-                  : SizedBox(
-                      height: 130,
-                      child: timeGame
-                          ? QuestionTimer(
-                              notifyParent: refresh,
-                              questions: content,
-                              key: globalKey)
-                          : SizedBox.shrink(),
-                    ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  timeGame || last == content.length + 1
-                      ? SizedBox(
-                          width: 60,
-                        )
-                      : (questionIndex == 0
-                          ? SizedBox(
-                              width: 66,
-                            )
-                          : IconButton(
-                              onPressed: () {
-                                if (questionIndex != 0) {
-                                  questionIndex--;
-                                } else {
-                                  return;
-                                }
-                                setState(() {});
-                              },
-                              icon:
-                                  const Icon(Icons.arrow_back_ios_new_rounded),
-                              iconSize: 50,
-                              color: Colors.black,
-                            )),
-                  last == content.length + 1
-                      ? DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            border: Border.all(color: Colors.black),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20),
                             ),
-                            gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: <Color>[
-                                  Color(0xff3987C7),
-                                  Color(0xff3A83C5),
-                                  Color(0xff3C78BD),
-                                  Color(0xff4067AF),
-                                ]),
                           ),
-                          child: SizedBox(
-                            height: 360,
-                            width: 270,
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 20, horizontal: 5),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      'Всего вопросов: ${content.length}',
-                                      style: TextStyle(
-                                          fontSize: 25, color: Colors.white),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      'Вопросов взято: ${answered.length}',
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    timeGame
-                                        ? SizedBox(
-                                            height: 10,
-                                          )
-                                        : SizedBox.shrink(),
-                                    timeGame
-                                        ? Text(
-                                            'Общее время: ${time}с',
-                                            style: TextStyle(
-                                                fontSize: 25,
-                                                color: Colors.white),
-                                          )
-                                        : SizedBox.shrink(),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                const Color(0xff3987C8)),
-                                        shadowColor: MaterialStateProperty.all(
-                                            const Color(0xff3987C8)),
-                                        overlayColor: MaterialStateProperty.all(
-                                            Colors.black12),
-                                        shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            side: const BorderSide(
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        addValue(
-                                            answered.length, 'rightAnswers');
-                                        timeGame
-                                            ? {
-                                                addValue(time, 'time'),
-                                                addValue(answered.length,
-                                                    'timeAnswered')
-                                              }
-                                            : null;
-                                        last = 1;
-                                        questionIndex = 0;
-                                        selected = 1;
-                                        time = 0;
-                                        answered.clear();
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const menu(),
-                                            ),
-                                            (route) => false);
-                                      },
-                                      child: Text(
-                                        'Домой',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    )
-                                  ],
+                    timeGame || last == content.length + 1
+                        ? SizedBox(
+                            width: 60,
+                          )
+                        : (questionIndex == content.length - 1
+                            ? SizedBox(
+                                width: 66,
+                              )
+                            : IconButton(
+                                iconSize: 50,
+                                onPressed: () {
+                                  if (questionIndex < content.length - 1) {
+                                    questionIndex++;
+                                  } else {
+                                    return;
+                                  }
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.arrow_forward_ios_rounded),
+                                color: Colors.black,
+                              ))
+                  ],
+                ),
+                Center(
+                  child: last == content.length + 1
+                      ? SizedBox.shrink()
+                      : SizedBox(
+                          width: 100,
+                          height: 40,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color(0xff3987C8)),
+                              shadowColor: MaterialStateProperty.all(
+                                  const Color(0xff3987C8)),
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.black12),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: const BorderSide(color: Colors.black),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      : Expanded(
-                          flex: 1,
-                          child: SizedBox(
-                            height: 300,
-                            width: 220,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black),
-                                gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: <Color>[
-                                      Color(0xff3987C7),
-                                      Color(0xff3A83C5),
-                                      Color(0xff3C78BD),
-                                      Color(0xff4067AF),
-                                    ]),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(20),
-                                ),
-                              ),
-                              child: InkWell(
-                                highlightColor: Colors.black38,
-                                splashColor: Colors.black26,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(20),
-                                ),
-                                onLongPress: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext builder) {
-                                      return AlertDialog(
-                                        contentPadding:
-                                            const EdgeInsets.all(24),
-                                        content: Text(
-                                          content[questionIndex].question,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        backgroundColor: Color(0xff4397de),
-                                      );
-                                    },
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(24),
+                                    content: Text(
+                                      content[questionIndex].answer,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: Color(0xff4397de),
                                   );
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SingleChildScrollView(
-                                    key: ValueKey(questionIndex),
-                                    scrollDirection: Axis.vertical,
-                                    child: Text(
-                                      content[questionIndex].question,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Ответ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
                               ),
                             ),
                           ),
                         ),
-                  timeGame || last == content.length + 1
-                      ? SizedBox(
-                          width: 60,
-                        )
-                      : (questionIndex == content.length - 1
-                          ? SizedBox(
-                              width: 66,
-                            )
-                          : IconButton(
-                              iconSize: 50,
-                              onPressed: () {
-                                if (questionIndex < content.length - 1) {
-                                  questionIndex++;
-                                } else {
-                                  return;
-                                }
-                                setState(() {});
-                              },
-                              icon: const Icon(Icons.arrow_forward_ios_rounded),
-                              color: Colors.black,
-                            ))
-                ],
-              ),
-              Center(
-                child: last == content.length + 1
-                    ? SizedBox.shrink()
-                    : SizedBox(
-                        width: 100,
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color(0xff3987C8)),
-                            shadowColor: MaterialStateProperty.all(
-                                const Color(0xff3987C8)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.black12),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  contentPadding: const EdgeInsets.all(24),
-                                  content: Text(
-                                    content[questionIndex].answer,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: Color(0xff4397de),
-                                );
-                              },
-                            );
-                          },
-                          child: const Text(
-                            'Ответ',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-              ),
-              Row(
-                children: [
-                  last == content.length + 1
-                      ? SizedBox.shrink()
-                      : Container(
-                          height: 210,
-                          width: MediaQuery.of(context).size.width,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: timeGame
-                                          ? () {
-                                              if (questionIndex !=
-                                                  content.length - 1) {
-                                                answered.contains(
-                                                        content[questionIndex]
-                                                            .id)
-                                                    ? null
-                                                    : answered.add(
-                                                        content[questionIndex]
-                                                            .id);
-                                                questionIndex++;
-                                                last++;
-                                                time += globalKey
-                                                        .currentState!
-                                                        .countDownDuration
-                                                        .inSeconds -
-                                                    globalKey.currentState!
-                                                        .duration.inSeconds;
-                                                globalKey.currentState?.timer
-                                                    ?.cancel();
-                                                globalKey.currentState?.reset();
-                                                setState(() {});
-                                              } else {
-                                                answered.add(
-                                                    content[questionIndex].id);
-                                                globalKey.currentState?.timer
-                                                    ?.cancel();
-                                                last++;
-                                                time += globalKey
-                                                        .currentState!
-                                                        .countDownDuration
-                                                        .inSeconds -
-                                                    globalKey.currentState!
-                                                        .duration.inSeconds;
-                                                setState(
-                                                  () {},
-                                                );
-                                              }
-                                            }
-                                          : answered.contains(
-                                                  content[questionIndex].id)
-                                              ? null
-                                              : () {
-                                                  answered.add(
-                                                      content[questionIndex]
-                                                          .id);
-                                                  if (questionIndex !=
-                                                      content.length - 1) {
-                                                    questionIndex++;
-                                                  }
+                ),
+                Row(
+                  children: [
+                    last == content.length + 1
+                        ? SizedBox.shrink()
+                        : Container(
+                            height: 210,
+                            width: MediaQuery.of(context).size.width,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: SizedBox(
+                                      width: 250,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        onPressed: timeGame
+                                            ? () {
+                                                if (questionIndex !=
+                                                    content.length - 1) {
+                                                  answered.contains(
+                                                          content[questionIndex]
+                                                              .id)
+                                                      ? null
+                                                      : answered.add(
+                                                          content[questionIndex]
+                                                              .id);
+                                                  questionIndex++;
                                                   last++;
+                                                  time += globalKey
+                                                          .currentState!
+                                                          .countDownDuration
+                                                          .inSeconds -
+                                                      globalKey.currentState!
+                                                          .duration.inSeconds;
+                                                  globalKey.currentState?.timer
+                                                      ?.cancel();
+                                                  globalKey.currentState?.reset();
+                                                  setState(() {});
+                                                } else {
+                                                  answered.add(
+                                                      content[questionIndex].id);
+                                                  globalKey.currentState?.timer
+                                                      ?.cancel();
+                                                  last++;
+                                                  time += globalKey
+                                                          .currentState!
+                                                          .countDownDuration
+                                                          .inSeconds -
+                                                      globalKey.currentState!
+                                                          .duration.inSeconds;
                                                   setState(
                                                     () {},
                                                   );
-                                                },
-                                      style: ButtonStyle(
-                                        backgroundColor: answered.contains(
-                                                content[questionIndex].id)
-                                            ? MaterialStateProperty.all(
-                                                const Color(0xff235d8c))
-                                            : MaterialStateProperty.all(
-                                                const Color(0xff3987C8)),
-                                        shadowColor: answered.contains(
-                                                content[questionIndex].id)
-                                            ? MaterialStateProperty.all(
-                                                const Color(0xff235d8c))
-                                            : MaterialStateProperty.all(
-                                                const Color(0xff3987C8)),
-                                        overlayColor: MaterialStateProperty.all(
-                                            const Color(0xff235d8c)),
-                                        shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            side: const BorderSide(
-                                                color: Colors.black),
+                                                }
+                                              }
+                                            : answered.contains(
+                                                    content[questionIndex].id)
+                                                ? null
+                                                : () {
+                                                    answered.add(
+                                                        content[questionIndex]
+                                                            .id);
+                                                    if (questionIndex !=
+                                                        content.length - 1) {
+                                                      questionIndex++;
+                                                    }
+                                                    last++;
+                                                    setState(
+                                                      () {},
+                                                    );
+                                                  },
+                                        style: ButtonStyle(
+                                          backgroundColor: answered.contains(
+                                                  content[questionIndex].id)
+                                              ? MaterialStateProperty.all(
+                                                  const Color(0xff235d8c))
+                                              : MaterialStateProperty.all(
+                                                  const Color(0xff3987C8)),
+                                          shadowColor: answered.contains(
+                                                  content[questionIndex].id)
+                                              ? MaterialStateProperty.all(
+                                                  const Color(0xff235d8c))
+                                              : MaterialStateProperty.all(
+                                                  const Color(0xff3987C8)),
+                                          overlayColor: MaterialStateProperty.all(
+                                              const Color(0xff235d8c)),
+                                          shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              side: const BorderSide(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Вопрос взят',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
                                           ),
                                         ),
                                       ),
-                                      child: const Text(
-                                        'Вопрос взят',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                        ),
-                                      ),
                                     ),
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                ],
-              ),
-            ],
+                          )
+                  ],
+                ),
+              ],
+            ),
           );
         },
         loadingBuilder: () {
