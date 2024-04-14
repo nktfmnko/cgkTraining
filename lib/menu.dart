@@ -137,7 +137,6 @@ class _menu extends State<menu> {
             '${await Supabase.instance.client.storage.from('pictures').getPublicUrl('${image?.path}')}'
       }).eq('email',
           '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
-      Navigator.pop(context);
       updateScreen();
     } on Exception catch (e) {
       throw new Exception(e);
