@@ -70,9 +70,9 @@ Future<void> addValue<T>(T value, String collumn) async {
     final data = await Supabase.instance.client
         .from('users')
         .select('email, $collumn')
-        .eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+        .eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
     await Supabase.instance.client.from('users').update(
-        {'$collumn': data.last.values.last + value}).eq('email', '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+        {'$collumn': data.last.values.last + value}).eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
   } on Exception {
     throw new Exception('Ошибка');
   }

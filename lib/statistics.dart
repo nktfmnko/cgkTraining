@@ -42,7 +42,7 @@ class _statState extends State<stat> {
     final response = await Supabase.instance.client
         .from('users')
         .select('rightAnswers, selectedQuestions')
-        .eq('email', '${rememberMe ? (prefs.getString('mail') ?? "") : userEmail}');
+        .eq('email', '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())

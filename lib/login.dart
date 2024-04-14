@@ -18,7 +18,7 @@ extension TypeCast<T> on T? {
 }
 
 String? userEmail;
-bool rememberMe = false;
+bool isLogin = false;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString("mail", mailController.text);
-      prefs.setBool("remember", rememberMe);
+      prefs.setBool("isLogin", true);
       userEmail = mailController.text;
       Navigator.pushAndRemoveUntil(
         context,
@@ -238,32 +238,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 1,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          child: Row(
-                            children: [
-                              Text(
-                                'Запомнить меня:',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              Checkbox(
-                                checkColor: Colors.black,
-                                activeColor: Colors.black26,
-                                side:
-                                    BorderSide(color: Colors.black, width: 1.5),
-                                value: rememberMe,
-                                onChanged: (value) {
-                                  setState(
-                                    () {
-                                      rememberMe = value!;
-                                    },
-                                  );
-                                },
-                              )
-                            ],
-                          ),
-                        ),
                         Align(
                           child: TextButton(
                             onPressed: () {

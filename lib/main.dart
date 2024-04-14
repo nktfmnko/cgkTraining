@@ -33,7 +33,7 @@ Future<void> main() async {
 
 Future<void> isRemembered() async{
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  rememberMe = prefs.getBool("remember") ?? false;
+  isLogin = prefs.getBool("isLogin") ?? false;
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: rememberMe ? const menu() : const LoginScreen(),
+      home: isLogin ? const menu() : const LoginScreen(),
       theme: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
           selectionHandleColor: Colors.white,

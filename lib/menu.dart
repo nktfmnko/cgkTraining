@@ -60,7 +60,7 @@ class _menu extends State<menu> {
         .from('users')
         .select('name, rightAnswers, time, picture, admin, timeAnswered')
         .eq('email',
-            '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
@@ -85,11 +85,11 @@ class _menu extends State<menu> {
 
   Future<void> exit() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("remember");
+    prefs.remove("isLogin");
     prefs.remove("mail");
     prefs.remove('sound');
     prefs.remove('vibration');
-    rememberMe = false;
+    isLogin = false;
     Navigator.of(context, rootNavigator: true).pop();
     Navigator.pushAndRemoveUntil(
         context,
@@ -136,7 +136,7 @@ class _menu extends State<menu> {
         'picture':
             '${await Supabase.instance.client.storage.from('pictures').getPublicUrl('${image?.path}')}'
       }).eq('email',
-          '${rememberMe ? (prefs?.getString('mail') ?? "") : userEmail}');
+          '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
       updateScreen();
     } on Exception catch (e) {
       throw new Exception(e);

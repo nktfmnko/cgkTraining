@@ -5,6 +5,7 @@ import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 extension TypeCast<T> on T? {
@@ -95,7 +96,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         isPressState.value = !isPressState.value;
         return;
       }
-
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("mail", mailController.text);
+      prefs.setBool("isLogin", true);
       await createUser(
           name: nameController.text,
           email: mailController.text,
