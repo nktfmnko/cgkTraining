@@ -64,15 +64,15 @@ String twoDigits(int n) {
   return n.toString().padLeft(2, '0');
 }
 
-Future<void> addValue<T>(T value, String collumn) async {
+Future<void> addValue<T>(T value, String column) async {
   try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final data = await Supabase.instance.client
         .from('users')
-        .select('email, $collumn')
+        .select('email, $column')
         .eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
     await Supabase.instance.client.from('users').update(
-        {'$collumn': data.last.values.last + value}).eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+        {'$column': data.last.values.last + value}).eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
   } on Exception {
     throw new Exception('Ошибка');
   }
