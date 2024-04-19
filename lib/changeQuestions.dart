@@ -37,7 +37,7 @@ class ConfirmDelete extends StatefulWidget {
 
 class _ConfirmDeleteState extends State<ConfirmDelete> {
   final deleteQuestionState =
-  UnionStateNotifier<void>(UnionState$Content(null));
+      UnionStateNotifier<void>(UnionState$Content(null));
   final isPressDeleteState = ValueNotifier<bool>(false);
 
   Future<void> deleteQuestion(String question) async {
@@ -75,21 +75,20 @@ class _ConfirmDeleteState extends State<ConfirmDelete> {
         return TextButton(
           onPressed: isPressDeleteState.value
               ? null
-              : () =>
-              deleteQuestion(
-                widget.question,
-              ),
+              : () => deleteQuestion(
+                    widget.question,
+                  ),
           child: ValueListenableBuilder<bool>(
             valueListenable: isPressDeleteState,
             builder: (_, isPress, __) {
               return isPress
                   ? CircularProgressIndicator(
-                color: Colors.white,
-              )
+                      color: Colors.white,
+                    )
                   : Text(
-                'Да',
-                style: TextStyle(color: Colors.white),
-              );
+                      'Да',
+                      style: TextStyle(color: Colors.white),
+                    );
             },
           ),
         );
@@ -112,12 +111,12 @@ class _ConfirmDeleteState extends State<ConfirmDelete> {
             builder: (_, isPress, __) {
               return isPress
                   ? CircularProgressIndicator(
-                color: Colors.white,
-              )
+                      color: Colors.white,
+                    )
                   : Text(
-                exception.toString(),
-                style: TextStyle(color: Colors.white),
-              );
+                      exception.toString(),
+                      style: TextStyle(color: Colors.white),
+                    );
             },
           ),
         );
@@ -148,7 +147,7 @@ class _AddQuestionState extends State<AddQuestion> {
   Future<void> addQuestion() async {
     try {
       final isFieldsValid =
-      correctFields(questionController.text, answerController.text);
+          correctFields(questionController.text, answerController.text);
       if (!isFieldsValid) {
         addQuestionState.error(MessageException('Поля неверно заполнены'));
         return;
@@ -192,7 +191,7 @@ class _AddQuestionState extends State<AddQuestion> {
     return Column(
       children: [
         TextFormField(
-          maxLines: 3,
+          maxLines: 4,
           cursorColor: Colors.white,
           style: TextStyle(color: Colors.white),
           controller: questionController,
@@ -213,7 +212,7 @@ class _AddQuestionState extends State<AddQuestion> {
           height: 15,
         ),
         TextFormField(
-          maxLines: 3,
+          maxLines: 4,
           cursorColor: Colors.white,
           style: TextStyle(color: Colors.white),
           controller: answerController,
@@ -254,12 +253,12 @@ class _AddQuestionState extends State<AddQuestion> {
                 builder: (_, isPress, __) {
                   return isPress
                       ? CircularProgressIndicator(
-                    color: Colors.white,
-                  )
+                          color: Colors.white,
+                        )
                       : Text(
-                    'Добавить',
-                    style: TextStyle(color: Colors.white),
-                  );
+                          'Добавить',
+                          style: TextStyle(color: Colors.white),
+                        );
                 },
               ),
             );
@@ -268,7 +267,7 @@ class _AddQuestionState extends State<AddQuestion> {
             return ElevatedButton(
               style: ButtonStyle(
                 backgroundColor:
-                MaterialStatePropertyAll<Color>(Color(0xff1b588c)),
+                    MaterialStatePropertyAll<Color>(Color(0xff1b588c)),
               ),
               onPressed: null,
               child: CircularProgressIndicator(
@@ -280,7 +279,7 @@ class _AddQuestionState extends State<AddQuestion> {
             return ElevatedButton(
               style: ButtonStyle(
                 backgroundColor:
-                MaterialStatePropertyAll<Color>(Color(0xff1b588c)),
+                    MaterialStatePropertyAll<Color>(Color(0xff1b588c)),
               ),
               onPressed: isPressAddState.value ? null : () => addQuestion(),
               child: ValueListenableBuilder<bool>(
@@ -288,12 +287,12 @@ class _AddQuestionState extends State<AddQuestion> {
                 builder: (_, isPress, __) {
                   return isPress
                       ? CircularProgressIndicator(
-                    color: Colors.white,
-                  )
+                          color: Colors.white,
+                        )
                       : Text(
-                    exception.toString(),
-                    style: TextStyle(color: Colors.white),
-                  );
+                          exception.toString(),
+                          style: TextStyle(color: Colors.white),
+                        );
                 },
               ),
             );
@@ -313,7 +312,7 @@ class adminChange extends StatefulWidget {
 
 class _adminChangeState extends State<adminChange> {
   final questionsState =
-  ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
+      ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
 
   Future<List<QA>> readData() async {
     final response = await Supabase.instance.client.from('questions').select();
@@ -321,12 +320,11 @@ class _adminChangeState extends State<adminChange> {
         .safeCast<List<Object?>>()
         .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
-          (e) =>
-          QA(
+          (e) => QA(
             question: e['question'].safeCast<String>(),
             answer: e['answer'].safeCast<String>(),
           ),
-    )
+        )
         .toList();
   }
 
@@ -365,17 +363,11 @@ class _adminChangeState extends State<adminChange> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height / 7,
+                      height: MediaQuery.of(context).size.height / 7,
                     ),
                     SizedBox(
                       height: 450,
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width - 10,
+                      width: MediaQuery.of(context).size.width - 10,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           border: Border.all(width: 1.5, color: Colors.black),
@@ -401,7 +393,7 @@ class _adminChangeState extends State<adminChange> {
                                     direction: DismissDirection.endToStart,
                                     background: Padding(
                                       padding:
-                                      const EdgeInsets.only(right: 8.0),
+                                          const EdgeInsets.only(right: 8.0),
                                       child: const ColoredBox(
                                         color: Colors.red,
                                         child: Align(
@@ -432,13 +424,12 @@ class _adminChangeState extends State<adminChange> {
                                             actions: [
                                               ConfirmDelete(
                                                 question:
-                                                content[index].question,
+                                                    content[index].question,
                                                 notifyParent: updateScreen,
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  Navigator.pop(
-                                                      context, false);
+                                                  Navigator.pop(context, false);
                                                 },
                                                 child: const Text(
                                                   'Нет',
@@ -457,7 +448,7 @@ class _adminChangeState extends State<adminChange> {
                                       child: DecoratedBox(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                           border: Border.all(
                                               color: Colors.black, width: 1.5),
                                         ),
@@ -465,7 +456,7 @@ class _adminChangeState extends State<adminChange> {
                                           title: Text(
                                             '${content[index].question}',
                                             style:
-                                            TextStyle(color: Colors.white),
+                                                TextStyle(color: Colors.white),
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -475,21 +466,19 @@ class _adminChangeState extends State<adminChange> {
                                               builder: (BuildContext builder) {
                                                 return AlertDialog(
                                                   contentPadding:
-                                                  const EdgeInsets.all(24),
+                                                      const EdgeInsets.all(24),
                                                   content:
-                                                  SingleChildScrollView(
+                                                      SingleChildScrollView(
                                                     child: Text(
-                                                      '${content[index]
-                                                          .question} \n\n Ответ: ${content[index]
-                                                          .answer}',
+                                                      '${content[index].question} \n\n Ответ: ${content[index].answer}',
                                                       textAlign:
-                                                      TextAlign.center,
+                                                          TextAlign.center,
                                                       style: TextStyle(
                                                           color: Colors.white),
                                                     ),
                                                   ),
                                                   backgroundColor:
-                                                  Color(0xff4397de),
+                                                      Color(0xff4397de),
                                                 );
                                               },
                                             );
@@ -512,7 +501,7 @@ class _adminChangeState extends State<adminChange> {
                           const Color(0xff3987C8),
                         ),
                         shape:
-                        MaterialStateProperty.all<RoundedRectangleBorder>(
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(7),
                             side: const BorderSide(color: Colors.black),
@@ -525,7 +514,10 @@ class _adminChangeState extends State<adminChange> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               backgroundColor: const Color(0xff4397de),
-                              title: AddQuestion(list: content),
+                              title: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: AddQuestion(list: content),
+                              ),
                             );
                           },
                         );
@@ -562,9 +554,9 @@ class _adminChangeState extends State<adminChange> {
                 ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty.all(const Color(0xff3987C8)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                     shadowColor:
-                    MaterialStateProperty.all(const Color(0xff3987C8)),
+                        MaterialStateProperty.all(const Color(0xff3987C8)),
                   ),
                   onPressed: () {
                     updateScreen();

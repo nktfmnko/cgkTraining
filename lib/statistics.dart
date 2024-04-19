@@ -59,7 +59,7 @@ class _statState extends State<stat> {
   Future<List<user>> readUsers() async {
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time, timeAnswered, picture');
+        .select('name, rightAnswers, time, timeAnswered, picture').neq('rightAnswers', 0);
     return TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
@@ -115,173 +115,169 @@ class _statState extends State<stat> {
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height / 2,
-                  child: ValueUnionStateListener<userStat>(
-                    unionListenable: statisticState,
-                    contentBuilder: (content) {
-                      return Column(
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2.5,
+                child: ValueUnionStateListener<userStat>(
+                  unionListenable: statisticState,
+                  contentBuilder: (content) {
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 2,
+                        ),
+                        Text(
+                          'Общее кол-во вопросов: ${content.selected}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        CircularPercentIndicator(
+                          radius: 105.0,
+                          lineWidth: 20.0,
+                          animation: true,
+                          animationDuration: 1000,
+                          percent: content.selected == 0 ? 0 : content.answered / content.selected,
+                          center: Text(content.selected == 0 ? '0%' :
+                            '${(content.answered / content.selected * 100).round()}%',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              color: Colors.white,
+                            ),
+                          ),
+                          circularStrokeCap: CircularStrokeCap.round,
+                          progressColor: Colors.yellow,
+                          backgroundColor: Colors.black,
+                        ),
+                        const SizedBox(height: 25),
+                        Text(
+                          'Кол-во взятых вопросов: ${content.answered}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  loadingBuilder: () {
+                    return const SafeArea(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'Статистика:',
-                            style: TextStyle(
-                              fontSize: 30,
-                              color: Colors.white,
-                            ),
+                          SizedBox(
+                            height: 125,
                           ),
-                          Text(
-                            'Общее кол-во вопросов: ${content.selected}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 25),
-                          CircularPercentIndicator(
-                            radius: 105.0,
-                            lineWidth: 20.0,
-                            animation: true,
-                            animationDuration: 1000,
-                            percent: content.selected == 0 ? 0 : content.answered / content.selected,
-                            center: Text(content.selected == 0 ? '0%' :
-                              '${(content.answered / content.selected * 100).round()}%',
-                              style: const TextStyle(
-                                fontSize: 40,
-                                color: Colors.white,
-                              ),
-                            ),
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.yellow,
-                            backgroundColor: Colors.black,
-                          ),
-                          const SizedBox(height: 25),
-                          Text(
-                            'Кол-во взятых вопросов: ${content.answered}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                            ),
-                          ),
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                          )
                         ],
-                      );
-                    },
-                    loadingBuilder: () {
-                      return const SafeArea(
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      )),
+                    );
+                  },
+                  errorBuilder: (_) {
+                    return SafeArea(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
                               height: 125,
                             ),
-                            CircularProgressIndicator(
-                              color: Colors.white,
-                            )
+                            const Text(
+                              'Ошибка, перезагрузите страницу',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                                shadowColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                              ),
+                              onPressed: () {
+                                updateScreen();
+                              },
+                              child: const Text('Обновить',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
                           ],
-                        )),
-                      );
-                    },
-                    errorBuilder: (_) {
-                      return SafeArea(
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                height: 125,
-                              ),
-                              const Text(
-                                'Ошибка, перезагрузите страницу',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      const Color(0xff3987C8)),
-                                  shadowColor: MaterialStateProperty.all(
-                                      const Color(0xff3987C8)),
-                                ),
-                                onPressed: () {
-                                  updateScreen();
-                                },
-                                child: const Text('Обновить',
-                                    style: TextStyle(color: Colors.white)),
-                              ),
-                            ],
-                          ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-                SizedBox(
-                  height: 1,
-                ),
-                //Таблица лидеров
-                SizedBox(
-                  height: MediaQuery.of(context).size.height / 2,
-                  width: double.infinity,
-                  child: ValueUnionStateListener<List<user>>(
-                    unionListenable: boardState,
-                    contentBuilder: (content) { 
-                          if (value == "TIME"){
-                            content.sort((p1, p2) => (p1.time / p1.timeAnswered).compareTo(p2.time / p2.timeAnswered));
-                          }
-                          else {
-                            content.sort((p1, p2) => p2.answered.compareTo(p1.answered));
-                          }
-                       return Scaffold(
+              ),
+              SizedBox(
+                height: 1,
+              ),
+              //Таблица лидеров
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                width: double.infinity,
+                child: ValueUnionStateListener<List<user>>(
+                  unionListenable: boardState,
+                  contentBuilder: (content) {
+                        if (value == "TIME"){
+                          content.sort((p1, p2) => (p1.time / p1.timeAnswered).compareTo(p2.time / p2.timeAnswered));
+                        }
+                        else {
+                          content.sort((p1, p2) => p2.answered.compareTo(p1.answered));
+                        }
+                     return Scaffold(
+                      backgroundColor: const Color(0xff3987C8),
+                      appBar: AppBar(
+                        leadingWidth: 0,
+                        leading: Text(""),
                         backgroundColor: const Color(0xff3987C8),
-                        appBar: AppBar(
-                          leadingWidth: 0,
-                          leading: Text(""),
-                          backgroundColor: const Color(0xff3987C8),
-                          toolbarHeight: 90,
-                          title:  Column(
-                            children: [
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              const Text("Таблица лидеров", style: TextStyle(color: Colors.white)),
-                              Row(
-                                children: [
-                                const Text("Ранг", style: TextStyle(color: Colors.white, fontSize: 17)),
-                                const Spacer(),
-                                const Text("Имя", style: TextStyle(color: Colors.white, fontSize: 17)),
-                                const Spacer(),
-                                DropdownButton<String>(
-                                  style: const TextStyle(color: Colors.white, fontSize: 17),
-                                  dropdownColor: Color(0xff3987C8),
-                                  value: value,
-                                  icon: const Icon(Icons.arrow_drop_down_rounded),
-                                  onChanged: (String? newValue)
-                                  {
-                                    setState(() {
-                                      value = newValue!;
-                                    });
-                                  },
-                                  items: const [
+                        toolbarHeight: 90,
+                        title:  Column(
+                          children: [
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            const Text("Таблица лидеров", style: TextStyle(color: Colors.white)),
+                            Row(
+                              children: [
+                              const Text("Ранг", style: TextStyle(color: Colors.white, fontSize: 17)),
+                              const Spacer(),
+                              const Text("Имя", style: TextStyle(color: Colors.white, fontSize: 17)),
+                              const Spacer(),
+                              DropdownButton<String>(
+                                style: const TextStyle(color: Colors.white, fontSize: 17),
+                                dropdownColor: Color(0xff3987C8),
+                                value: value,
+                                icon: const Icon(Icons.arrow_drop_down_rounded),
+                                onChanged: (String? newValue)
+                                {
+                                  setState(() {
+                                    value = newValue!;
+                                  });
+                                },
+                                items: const [
+                                  DropdownMenuItem<String>(
+                                    value: "TIME",
+                                    child: Text("Время")
+                                    ),
                                     DropdownMenuItem<String>(
-                                      value: "TIME",
-                                      child: Text("Время")
-                                      ),
-                                      DropdownMenuItem<String>(
-                                      value: "POINT",
-                                      child: Text("Очки")
-                                      )
-                                  ], 
-                                ),
-                                ]
-                                ),
-                              const Divider()
-                            ],
-                          ),
+                                    value: "POINT",
+                                    child: Text("Очки")
+                                    )
+                                ],
+                              ),
+                              ]
+                              ),
+                            const Divider()
+                          ],
                         ),
-                        body: ListView.separated(
+                      ),
+                      body: SafeArea(
+                        child: ListView.separated(
                           itemCount: content.length,
                           itemBuilder: (context, index) {
                             return Row(
@@ -296,7 +292,7 @@ class _statState extends State<stat> {
                                   ),
                                 ),
                                  CircleAvatar(
-                                  backgroundImage:  content[index].picture.isEmpty? 
+                                  backgroundImage:  content[index].picture.isEmpty?
                                   Image.asset("assets/avatar_image.png").image:  Image(image: NetworkImage(content[index].picture)).image,
                                   backgroundColor: Colors.black,
                                   radius: 12,
@@ -316,7 +312,7 @@ class _statState extends State<stat> {
                                   width: 50,
                                   child: Center(
                                     child: Text(
-                                      value == "POINT"? content[index].answered.toString(): 
+                                      value == "POINT"? content[index].answered.toString():
                                         content[index].timeAnswered == 0? "0": (content[index].time / content[index].timeAnswered).toStringAsFixed(2),
                                       style: const TextStyle(color: Colors.white, fontSize: 17),
                                     ),
@@ -333,59 +329,59 @@ class _statState extends State<stat> {
                             );
                           },
                         ),
-                      );
-                    },
-                    loadingBuilder: () {
-                      return const SafeArea(
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    );
+                  },
+                  loadingBuilder: () {
+                    return const SafeArea(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 125,
+                          ),
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        ],
+                      )),
+                    );
+                  },
+                  errorBuilder: (_) {
+                    return SafeArea(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
                               height: 125,
                             ),
-                            CircularProgressIndicator(
-                              color: Colors.white,
-                            )
+                            const Text(
+                              'Ошибка, перезагрузите страницу',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                                shadowColor: MaterialStateProperty.all(
+                                    const Color(0xff3987C8)),
+                              ),
+                              onPressed: () {
+                                updateBoard();
+                              },
+                              child: const Text('Обновить',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
                           ],
-                        )),
-                      );
-                    },
-                    errorBuilder: (_) {
-                      return SafeArea(
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                height: 125,
-                              ),
-                              const Text(
-                                'Ошибка, перезагрузите страницу',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      const Color(0xff3987C8)),
-                                  shadowColor: MaterialStateProperty.all(
-                                      const Color(0xff3987C8)),
-                                ),
-                                onPressed: () {
-                                  updateBoard();
-                                },
-                                child: const Text('Обновить',
-                                    style: TextStyle(color: Colors.white)),
-                              ),
-                            ],
-                          ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
