@@ -12,7 +12,7 @@ class StateTimer2Page extends StatefulWidget {
 }
 
 // Класс Таймера
-class _StateTimer2PageState extends State<StateTimer2Page> {
+class _StateTimer2PageState extends State<StateTimer2Page> with WidgetsBindingObserver{
   Timer? _timer;
   late int _waitTime;
   var _percent = 1.0;
@@ -22,6 +22,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _waitTime = 60;
     _calculateTime();
   }
@@ -29,6 +30,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
   @override
   void dispose() {
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
   }
 
@@ -78,6 +80,11 @@ class _StateTimer2PageState extends State<StateTimer2Page> {
       _percent = _waitTime / 60;
       timeStr = '$minuteStr:$secondStr';
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) pause();
   }
 
   @override
