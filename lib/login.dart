@@ -214,14 +214,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return mail.isNotEmpty && password.isNotEmpty;
   }
 
-  bool correctLogin(List<UserInfo> users) {
-    for (final user in users) {
-      if (user.mail == mailController.text &&
-          user.password == passwordController.text) return true;
-    }
-    return false;
-  }
-
   Future<void> login() async {
     try {
       setState(() {});
@@ -233,12 +225,13 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       isPressState.value = !isPressState.value;
 
-      final userInfo = await readLogins();
-      if (!correctLogin(userInfo)) {
+      final response = await supabase.from('users').select('email, password').eq('email', mailController.text).eq('password', passwordController.text);
+      if (response.isEmpty) {
         loginState.error(MessageException('Неверный логин или пароль'));
         isPressState.value = !isPressState.value;
         return;
       }
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString("mail", mailController.text);
       prefs.setBool("isLogin", true);

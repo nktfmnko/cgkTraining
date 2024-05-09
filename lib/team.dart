@@ -23,7 +23,7 @@ class _TeamState extends State<Team> {
     return Scaffold(
       backgroundColor: const Color(0xff4397de),
       body: SafeArea(
-        child: haveTeam!.isEmpty
+        child: haveTeam == 0
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

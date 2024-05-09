@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/statistics.dart';
@@ -6,6 +7,7 @@ import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class makeTeam extends StatefulWidget {
   const makeTeam({super.key});
@@ -24,15 +26,16 @@ class _makeTeamState extends State<makeTeam> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time, timeAnswered, picture')
+        .select('name, rightAnswers, time, timeAnswered, picture, email')
         .neq('name', 'admin')
         .neq('email', '${prefs.getString("mail")}')
-        .eq('team', '');
+        .eq('team_id', 0);
     return TypeCast(response)
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
           (e) => user(
+              email: TypeCast(e['email']).safeCast<String>(),
               name: TypeCast(e['name']).safeCast<String>(),
               answered: TypeCast(e['rightAnswers']).safeCast<int>(),
               time: TypeCast(e['time']).safeCast<int>(),
@@ -55,14 +58,71 @@ class _makeTeamState extends State<makeTeam> {
     }
   }
 
+  Future<void> sendInvites(List<user> list, int teamId) async {
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    for (int i = 0; i < list.length - 1; i++) {
+      if(_isChecked[i]){
+        await http.post(
+          url,
+          headers: {
+            'origin': 'http://localhost',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(
+            {
+              'service_id': 'service_23bd6wb',
+              'template_id': 'template_8hairan',
+              'user_id': 'RK2JAm99g7P7VusxQ',
+              'template_params': {
+                'to_email': '${list[i].email}',
+                'message': 'cgk.app/team/${teamId}',
+              }
+            },
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> createTeam(List<user> list) async {
     try {
       if (teamName.text.isEmpty) {
         createState.error(MessageException('Поле неверно заполнено'));
         return;
       }
+
       isPressState.value = !isPressState.value;
       setState(() {});
+      final response = await Supabase.instance.client
+          .from('teams')
+          .select()
+          .eq('team_name', teamName.text);
+      if (response.isNotEmpty) {
+        createState.error(
+          MessageException('Команда с таким названием уже есть'),
+        );
+        isPressState.value = !isPressState.value;
+        return;
+      }
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      await Supabase.instance.client.from('teams').insert({
+        'team_name': teamName.text,
+        'capitan': '${prefs?.getString('mail') ?? ""}'
+      });
+
+      Future.delayed(Duration(seconds: 1));
+
+      final teamId = await Supabase.instance.client
+          .from('teams')
+          .select('id')
+          .eq('team_name', teamName.text);
+
+      await Supabase.instance.client.from('users').update(
+          {'team_id': teamId}).eq('email', '${prefs?.getString('mail') ?? ""}');
+
+      sendInvites(list, teamId.last.values.last);
     } on Exception {
       createState.error(MessageException('Произошла ошибка, повторите'));
       isPressState.value = !isPressState.value;

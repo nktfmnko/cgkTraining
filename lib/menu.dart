@@ -21,7 +21,7 @@ extension TypeCast<T> on T? {
   }
 }
 
-String? haveTeam;
+late int haveTeam;
 
 //Звук
 bool? sound = true;
@@ -36,7 +36,7 @@ class userWithPic {
   final String picture;
   final bool admin;
   final int time_answered;
-  final String team;
+  final int team_id;
 
   const userWithPic({
     required this.name,
@@ -45,7 +45,7 @@ class userWithPic {
     required this.picture,
     required this.admin,
     required this.time_answered,
-    required this.team,
+    required this.team_id,
   });
 }
 
@@ -64,7 +64,8 @@ class _menu extends State<menu> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await Supabase.instance.client
         .from('users')
-        .select('name, rightAnswers, time, picture, admin, timeAnswered, team')
+        .select(
+            'name, rightAnswers, time, picture, admin, timeAnswered, team_id')
         .eq('email',
             '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
     final data = TypeCast(response)
@@ -72,17 +73,16 @@ class _menu extends State<menu> {
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
           (e) => userWithPic(
-            name: TypeCast(e['name']).safeCast<String>(),
-            answered: TypeCast(e['rightAnswers']).safeCast<int>(),
-            time: TypeCast(e['time']).safeCast<int>(),
-            picture: TypeCast(e['picture']).safeCast<String>(),
-            admin: TypeCast(e['admin']).safeCast<bool>(),
-            time_answered: TypeCast(e['timeAnswered']).safeCast<int>(),
-            team: TypeCast(e['team']).safeCast<String>(),
-          ),
+              name: TypeCast(e['name']).safeCast<String>(),
+              answered: TypeCast(e['rightAnswers']).safeCast<int>(),
+              time: TypeCast(e['time']).safeCast<int>(),
+              picture: TypeCast(e['picture']).safeCast<String>(),
+              admin: TypeCast(e['admin']).safeCast<bool>(),
+              time_answered: TypeCast(e['timeAnswered']).safeCast<int>(),
+              team_id: TypeCast(e['team_id']).safeCast<int>()),
         )
         .toList();
-    haveTeam = data.last.team;
+    haveTeam = data.last.team_id;
     return userWithPic(
       name: data.last.name,
       answered: data.last.answered,
@@ -90,7 +90,7 @@ class _menu extends State<menu> {
       picture: data.last.picture,
       admin: data.last.admin,
       time_answered: data.last.time_answered,
-      team: data.last.team,
+      team_id: data.last.team_id,
     );
   }
 
@@ -179,14 +179,15 @@ class _menu extends State<menu> {
         loadingBuilder: () {
           return SafeArea(
             child: Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  color: Colors.white,
-                )
-              ],
-            )),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                ],
+              ),
+            ),
           );
         },
         contentBuilder: (content) {
@@ -326,7 +327,7 @@ class _menu extends State<menu> {
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: Text(
-                                            'Среднее время: ${content.time_answered == 0 ? 0 : content.time / content.time_answered}',
+                                            'Среднее время: ${content.time_answered == 0 ? 0 : (content.time / content.time_answered).toStringAsFixed(1)}',
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 20),
