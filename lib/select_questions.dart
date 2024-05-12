@@ -172,7 +172,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
               style: TextStyle(fontSize: 22, color: Colors.white),
             ),
             SizedBox(
-              height: 20,
+              height: MediaQuery.of(context).size.height * 0.015,
             ),
             Slider(
               activeColor: Colors.black,
@@ -215,11 +215,11 @@ class _SelectQuestionState extends State<SelectQuestion> {
               ],
             ),
             SizedBox(
-              height: 10,
+              height: MediaQuery.of(context).size.height * 0.015,
             ),
             SizedBox(
-              height: 45,
-              width: 120,
+              height: MediaQuery.of(context).size.height * 0.05,
+              width: MediaQuery.of(context).size.width * 0.32,
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor:
@@ -243,7 +243,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
                     MaterialPageRoute(
                       builder: (context) => const Training(),
                     ),
-                    (route) => false,
+                    (route) => true,
                   );
                 },
                 child: Text(
@@ -256,7 +256,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
               ),
             ),
             SizedBox(
-              height: 10,
+              height: MediaQuery.of(context).size.height * 0.015,
             ),
             TextButton(
               onPressed: () {

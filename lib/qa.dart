@@ -70,9 +70,12 @@ Future<void> addValue<T>(T value, String column) async {
     final data = await Supabase.instance.client
         .from('users')
         .select('email, $column')
-        .eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
-    await Supabase.instance.client.from('users').update(
-        {'$column': data.last.values.last + value}).eq('email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+        .eq('email',
+            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+    await Supabase.instance.client
+        .from('users')
+        .update({'$column': data.last.values.last + value}).eq('email',
+            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
   } on Exception {
     throw new Exception('Ошибка');
   }
@@ -148,7 +151,7 @@ class _QuestionTimerState extends State<QuestionTimer> {
   }
 }
 
-class _TrainingState extends State<Training> with WidgetsBindingObserver{
+class _TrainingState extends State<Training> with WidgetsBindingObserver {
   final qaState = ValueNotifier<UnionState<List<QA>>>(UnionState$Loading());
 
   //чтение данных из бд
@@ -195,8 +198,10 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
-    if(state == AppLifecycleState.paused && timeGame && globalKey.currentState!.timer!.isActive){
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused &&
+        timeGame &&
+        globalKey.currentState!.timer!.isActive) {
       globalKey.currentState!.timer?.cancel();
       showDialog(
         barrierDismissible: false,
@@ -205,17 +210,15 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
           return AlertDialog(
             backgroundColor: Color(0xff4397de),
             content: SizedBox(
-              height: 180,
+              height: MediaQuery.of(context).size.height * 0.25,
               child: Column(
-                mainAxisAlignment:
-                MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context, rootNavigator: true).pop();
-                        globalKey.currentState!
-                            .startTimer();
+                        globalKey.currentState!.startTimer();
                         setState(() {});
                       },
                       child: Text(
@@ -225,30 +228,25 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                         ),
                       ),
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStatePropertyAll<
-                            Color>(
+                        backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(0xff3987C8),
                         ),
                         shape:
-                        MaterialStateProperty.all<
-                            RoundedRectangleBorder>(
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(
+                            borderRadius: BorderRadius.all(
                               Radius.circular(8),
                             ),
-                            side: BorderSide(
-                                color: Colors.black),
+                            side: BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
                     ),
-                    width: 170,
-                    height: 50,
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    height: MediaQuery.of(context).size.height * 0.066,
                   ),
                   SizedBox(
-                    height: 30,
+                    height: MediaQuery.of(context).size.height * 0.05,
                   ),
                   SizedBox(
                     child: ElevatedButton(
@@ -261,10 +259,9 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                              const menu(),
+                              builder: (context) => const menu(),
                             ),
-                                (route) => false);
+                            (route) => false);
                       },
                       child: Text(
                         "Домой",
@@ -273,27 +270,22 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                         ),
                       ),
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStatePropertyAll<
-                            Color>(
+                        backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(0xff3987C8),
                         ),
                         shape:
-                        MaterialStateProperty.all<
-                            RoundedRectangleBorder>(
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(
+                            borderRadius: BorderRadius.all(
                               Radius.circular(8),
                             ),
-                            side: BorderSide(
-                                color: Colors.black),
+                            side: BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
                     ),
-                    width: 170,
-                    height: 50,
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    height: MediaQuery.of(context).size.height * 0.066,
                   ),
                 ],
               ),
@@ -333,7 +325,7 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
           }
           return SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 timeGame
                     ? (last == content.length + 1
@@ -351,7 +343,10 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                       return AlertDialog(
                                         backgroundColor: Color(0xff4397de),
                                         content: SizedBox(
-                                          height: 180,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.25,
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -359,7 +354,9 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                               SizedBox(
                                                 child: ElevatedButton(
                                                   onPressed: () {
-                                                    Navigator.of(context, rootNavigator: true).pop();
+                                                    Navigator.of(context,
+                                                            rootNavigator: true)
+                                                        .pop();
                                                     globalKey.currentState!
                                                         .startTimer();
                                                     setState(() {});
@@ -376,8 +373,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                             Color>(
                                                       Color(0xff3987C8),
                                                     ),
-                                                    shape:
-                                                        MaterialStateProperty.all<
+                                                    shape: MaterialStateProperty
+                                                        .all<
                                                             RoundedRectangleBorder>(
                                                       RoundedRectangleBorder(
                                                         borderRadius:
@@ -385,16 +382,26 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                           Radius.circular(8),
                                                         ),
                                                         side: BorderSide(
-                                                            color: Colors.black),
+                                                            color:
+                                                                Colors.black),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                                width: 170,
-                                                height: 50,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.45,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.066,
                                               ),
                                               SizedBox(
-                                                height: 30,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.05,
                                               ),
                                               SizedBox(
                                                 child: ElevatedButton(
@@ -404,13 +411,14 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                     selected = 1;
                                                     time = 0;
                                                     answered.clear();
-                                                    Navigator.pushAndRemoveUntil(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const menu(),
-                                                        ),
-                                                        (route) => false);
+                                                    Navigator
+                                                        .pushAndRemoveUntil(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const menu(),
+                                                            ),
+                                                            (route) => false);
                                                   },
                                                   child: Text(
                                                     "Домой",
@@ -424,8 +432,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                             Color>(
                                                       Color(0xff3987C8),
                                                     ),
-                                                    shape:
-                                                        MaterialStateProperty.all<
+                                                    shape: MaterialStateProperty
+                                                        .all<
                                                             RoundedRectangleBorder>(
                                                       RoundedRectangleBorder(
                                                         borderRadius:
@@ -433,13 +441,20 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                           Radius.circular(8),
                                                         ),
                                                         side: BorderSide(
-                                                            color: Colors.black),
+                                                            color:
+                                                                Colors.black),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                                width: 170,
-                                                height: 50,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.45,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.066,
                                               ),
                                             ],
                                           ),
@@ -451,7 +466,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                 },
                                 icon: Icon(
                                   Icons.pause,
-                                  size: 55,
+                                  size:
+                                      MediaQuery.of(context).size.width * 0.105,
                                   color: Colors.white,
                                 ),
                               )
@@ -463,19 +479,24 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(top: 9, right: 2),
+                                padding:
+                                    const EdgeInsets.only(top: 9, right: 2),
                                 child: SizedBox(
-                                  height: 40,
-                                  width: 135,
+                                  height: MediaQuery.of(context).size.height *
+                                      0.055,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.35,
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      backgroundColor: MaterialStateProperty.all(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
                                         const Color(0xff3987C8),
                                       ),
                                       shape: MaterialStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(7),
+                                          borderRadius:
+                                              BorderRadius.circular(7),
                                           side: const BorderSide(
                                               color: Colors.black),
                                         ),
@@ -497,7 +518,10 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                             ),
                                             backgroundColor: Color(0xff4397de),
                                             content: SizedBox(
-                                              height: 180,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.2,
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -505,8 +529,6 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                   SizedBox(
                                                     child: ElevatedButton(
                                                       onPressed: () {
-                                                        addValue(answered.length,
-                                                            'rightAnswers');
                                                         last = 1;
                                                         questionIndex = 0;
                                                         selected = 1;
@@ -519,7 +541,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                                       (context) =>
                                                                           const menu(),
                                                                 ),
-                                                                (route) => false);
+                                                                (route) =>
+                                                                    false);
                                                       },
                                                       child: Text(
                                                         "Завершить",
@@ -538,26 +561,43 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                                 RoundedRectangleBorder>(
                                                           RoundedRectangleBorder(
                                                             borderRadius:
-                                                                BorderRadius.all(
-                                                              Radius.circular(8),
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  8),
                                                             ),
                                                             side: BorderSide(
-                                                                color:
-                                                                    Colors.black),
+                                                                color: Colors
+                                                                    .black),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                    width: 170,
-                                                    height: 50,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.45,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.066,
                                                   ),
                                                   SizedBox(
-                                                    height: 30,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.02,
                                                   ),
                                                   SizedBox(
                                                     child: ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.of(context, rootNavigator: true).pop();
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop();
                                                       },
                                                       child: Text(
                                                         "Продолжить",
@@ -576,18 +616,28 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                                 RoundedRectangleBorder>(
                                                           RoundedRectangleBorder(
                                                             borderRadius:
-                                                                BorderRadius.all(
-                                                              Radius.circular(8),
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  8),
                                                             ),
                                                             side: BorderSide(
-                                                                color:
-                                                                    Colors.black),
+                                                                color: Colors
+                                                                    .black),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                    width: 170,
-                                                    height: 50,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.45,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.066,
                                                   ),
                                                 ],
                                               ),
@@ -609,7 +659,7 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                 last == content.length + 1
                     ? SizedBox.shrink()
                     : SizedBox(
-                        height: 130,
+                        height: MediaQuery.of(context).size.height * 0.13,
                         child: timeGame
                             ? QuestionTimer(
                                 notifyParent: refresh,
@@ -620,144 +670,148 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    timeGame || last == content.length + 1
-                        ? SizedBox(
-                            width: 60,
-                          )
-                        : (questionIndex == 0
-                            ? SizedBox(
-                                width: 66,
-                              )
-                            : IconButton(
-                                onPressed: () {
-                                  if (questionIndex != 0) {
-                                    questionIndex--;
-                                  } else {
-                                    return;
-                                  }
-                                  setState(() {});
-                                },
-                                icon:
-                                    const Icon(Icons.arrow_back_ios_new_rounded),
-                                iconSize: 50,
-                                color: Colors.black,
-                              )),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.125),
                     last == content.length + 1
-                        ? DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.black26,
-                              border: Border.all(color: Colors.black),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
+                        ? Column(
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.2,
                               ),
-                              gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: <Color>[
-                                    Color(0xff3987C7),
-                                    Color(0xff3A83C5),
-                                    Color(0xff3C78BD),
-                                    Color(0xff4067AF),
-                                  ]),
-                            ),
-                            child: SizedBox(
-                              height: 360,
-                              width: 270,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 20, horizontal: 5),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Всего вопросов: ${content.length}',
-                                        style: TextStyle(
-                                            fontSize: 25, color: Colors.white),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        'Вопросов взято: ${answered.length}',
-                                        style: TextStyle(
-                                          fontSize: 25,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      timeGame
-                                          ? SizedBox(
-                                              height: 10,
-                                            )
-                                          : SizedBox.shrink(),
-                                      timeGame
-                                          ? Text(
-                                              'Общее время: ${time}с',
-                                              style: TextStyle(
-                                                  fontSize: 25,
-                                                  color: Colors.white),
-                                            )
-                                          : SizedBox.shrink(),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      ElevatedButton(
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  const Color(0xff3987C8)),
-                                          shadowColor: MaterialStateProperty.all(
-                                              const Color(0xff3987C8)),
-                                          overlayColor: MaterialStateProperty.all(
-                                              Colors.black12),
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              side: const BorderSide(
-                                                  color: Colors.black),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: <Color>[
+                                        Color(0xff3987C7),
+                                        Color(0xff3A83C5),
+                                        Color(0xff3C78BD),
+                                        Color(0xff4067AF),
+                                      ]),
+                                ),
+                                child: SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.485,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.75,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20, horizontal: 5),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            'Всего вопросов: ${content.length}',
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                        ),
-                                        onPressed: () {
-                                          addValue(
-                                              answered.length, 'rightAnswers');
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.015,
+                                          ),
+                                          Text(
+                                            'Вопросов взято: ${answered.length}',
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                           timeGame
-                                              ? {
-                                                  addValue(time, 'time'),
-                                                  addValue(answered.length,
-                                                      'timeAnswered')
-                                                }
-                                              : null;
-                                          last = 1;
-                                          questionIndex = 0;
-                                          selected = 1;
-                                          time = 0;
-                                          answered.clear();
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const menu(),
+                                              ? SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.015,
+                                                )
+                                              : SizedBox.shrink(),
+                                          timeGame
+                                              ? Text(
+                                                  'Общее время: ${time}с',
+                                                  style: TextStyle(
+                                                      fontSize: 25,
+                                                      color: Colors.white),
+                                                )
+                                              : SizedBox.shrink(),
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.015,
+                                          ),
+                                          ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                      const Color(0xff3987C8)),
+                                              shadowColor:
+                                                  MaterialStateProperty.all(
+                                                      const Color(0xff3987C8)),
+                                              overlayColor:
+                                                  MaterialStateProperty.all(
+                                                      Colors.black12),
+                                              shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  side: const BorderSide(
+                                                      color: Colors.black),
+                                                ),
                                               ),
-                                              (route) => false);
-                                        },
-                                        child: Text(
-                                          'Домой',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      )
-                                    ],
+                                            ),
+                                            onPressed: () {
+                                              addValue(answered.length,
+                                                  'rightAnswers');
+                                              timeGame
+                                                  ? {
+                                                      addValue(time, 'time'),
+                                                      addValue(answered.length,
+                                                          'timeAnswered')
+                                                    }
+                                                  : null;
+                                              last = 1;
+                                              questionIndex = 0;
+                                              selected = 1;
+                                              time = 0;
+                                              answered.clear();
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const menu(),
+                                                  ),
+                                                  (route) => false);
+                                            },
+                                            child: Text(
+                                              'Домой',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           )
                         : Expanded(
                             flex: 1,
                             child: SizedBox(
-                              height: 300,
-                              width: 220,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.485,
+                              //width: 50,
                               child: DecoratedBox(
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.black),
@@ -790,7 +844,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                           content: Text(
                                             content[questionIndex].question,
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                           backgroundColor: Color(0xff4397de),
                                         );
@@ -816,35 +871,18 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                               ),
                             ),
                           ),
-                    timeGame || last == content.length + 1
-                        ? SizedBox(
-                            width: 60,
-                          )
-                        : (questionIndex == content.length - 1
-                            ? SizedBox(
-                                width: 66,
-                              )
-                            : IconButton(
-                                iconSize: 50,
-                                onPressed: () {
-                                  if (questionIndex < content.length - 1) {
-                                    questionIndex++;
-                                  } else {
-                                    return;
-                                  }
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.arrow_forward_ios_rounded),
-                                color: Colors.black,
-                              ))
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.125),
                   ],
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.01,
                 ),
                 Center(
                   child: last == content.length + 1
                       ? SizedBox.shrink()
                       : SizedBox(
-                          width: 100,
-                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.28,
+                          height: MediaQuery.of(context).size.height * 0.045,
                           child: ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all(
@@ -892,17 +930,73 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                     last == content.length + 1
                         ? SizedBox.shrink()
                         : Container(
-                            height: 210,
+                            height: MediaQuery.of(context).size.height * 0.2,
                             width: MediaQuery.of(context).size.width,
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  timeGame
+                                      ? SizedBox.shrink()
+                                      : SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.666,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.06,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              questionIndex++;
+                                              last++;
+                                              setState(() {});
+                                            },
+                                            child: Text(
+                                              'Следующий ',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                Color(0xff3987C8),
+                                              ),
+                                              shadowColor:
+                                                  MaterialStateProperty.all(
+                                                Color(0xff3987C8),
+                                              ),
+                                              overlayColor:
+                                                  MaterialStateProperty.all(
+                                                const Color(0xff235d8c),
+                                              ),
+                                              shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  side: const BorderSide(
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.01,
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: SizedBox(
-                                      width: 250,
-                                      height: 50,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.666,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.06,
                                       child: ElevatedButton(
                                         onPressed: timeGame
                                             ? () {
@@ -925,11 +1019,13 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                           .duration.inSeconds;
                                                   globalKey.currentState?.timer
                                                       ?.cancel();
-                                                  globalKey.currentState?.reset();
+                                                  globalKey.currentState
+                                                      ?.reset();
                                                   setState(() {});
                                                 } else {
                                                   answered.add(
-                                                      content[questionIndex].id);
+                                                      content[questionIndex]
+                                                          .id);
                                                   globalKey.currentState?.timer
                                                       ?.cancel();
                                                   last++;
@@ -973,8 +1069,9 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver{
                                                   const Color(0xff235d8c))
                                               : MaterialStateProperty.all(
                                                   const Color(0xff3987C8)),
-                                          overlayColor: MaterialStateProperty.all(
-                                              const Color(0xff235d8c)),
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  const Color(0xff235d8c)),
                                           shape: MaterialStateProperty.all<
                                               RoundedRectangleBorder>(
                                             RoundedRectangleBorder(

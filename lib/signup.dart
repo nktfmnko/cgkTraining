@@ -164,8 +164,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     TextFormField(
                       cursorColor: Colors.white,
@@ -200,8 +200,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     ValueListenableBuilder<bool>(
                       valueListenable: obscureTextState,
@@ -248,10 +248,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                       },
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.05,
                       width: double.infinity,
                       child: ValueUnionStateListener<void>(
                         unionListenable: registerState,

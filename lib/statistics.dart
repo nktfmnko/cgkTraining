@@ -136,7 +136,7 @@ class _statState extends State<stat> {
                     return Column(
                       children: [
                         SizedBox(
-                          height: 2,
+                          height: MediaQuery.of(context).size.height * 0.005,
                         ),
                         Text(
                           'Общее кол-во вопросов: ${content.selected}',
@@ -145,7 +145,8 @@ class _statState extends State<stat> {
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 25),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.025),
                         CircularPercentIndicator(
                           radius: 105.0,
                           lineWidth: 20.0,
@@ -167,7 +168,8 @@ class _statState extends State<stat> {
                           progressColor: Colors.yellow,
                           backgroundColor: Colors.black,
                         ),
-                        const SizedBox(height: 25),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.025),
                         Text(
                           'Кол-во взятых вопросов: ${content.answered}',
                           style: const TextStyle(
@@ -228,11 +230,11 @@ class _statState extends State<stat> {
                 ),
               ),
               SizedBox(
-                height: 1,
+                height: MediaQuery.of(context).size.height * 0.001,
               ),
               //Таблица лидеров
               SizedBox(
-                height: MediaQuery.of(context).size.height / 2,
+                height: MediaQuery.of(context).size.height / 1.87,
                 width: double.infinity,
                 child: ValueUnionStateListener<List<user>>(
                   unionListenable: boardState,

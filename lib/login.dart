@@ -93,8 +93,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 170,
-      width: 300,
+      height: MediaQuery.of(context).size.height * 0.19,
+      width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
           TextFormField(
@@ -119,7 +119,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: MediaQuery.of(context).size.height * 0.035,
           ),
           ValueUnionStateListener<void>(
             unionListenable: forgotState,
@@ -266,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height / 4.5,
+                  height: MediaQuery.of(context).size.height / 4,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,8 +296,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.032,
                     ),
                     ValueListenableBuilder<bool>(
                       valueListenable: obscureTextState,
@@ -336,8 +336,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       },
                     ),
-                    const SizedBox(
-                      height: 1,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.001,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -366,6 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.05,
                       width: double.infinity,
                       child: ValueUnionStateListener(
                         unionListenable: loginState,
@@ -430,8 +431,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.015,
                 ),
                 TextButton(
                   onPressed: () {

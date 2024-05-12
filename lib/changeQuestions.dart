@@ -209,7 +209,7 @@ class _AddQuestionState extends State<AddQuestion> {
           ),
         ),
         SizedBox(
-          height: 15,
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
         TextFormField(
           maxLines: 4,
@@ -230,7 +230,7 @@ class _AddQuestionState extends State<AddQuestion> {
           ),
         ),
         SizedBox(
-          height: 15,
+          height: MediaQuery.of(context).size.height * 0.015,
         ),
         ValueUnionStateListener(
           unionListenable: addQuestionState,
@@ -363,10 +363,10 @@ class _adminChangeState extends State<adminChange> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 7,
+                      height: MediaQuery.of(context).size.height / 7.5,
                     ),
                     SizedBox(
-                      height: 450,
+                      height: MediaQuery.of(context).size.height * 0.6,
                       width: MediaQuery.of(context).size.width - 10,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -493,7 +493,7 @@ class _adminChangeState extends State<adminChange> {
                       ),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: MediaQuery.of(context).size.height * 0.02,
                     ),
                     ElevatedButton(
                       style: ButtonStyle(
