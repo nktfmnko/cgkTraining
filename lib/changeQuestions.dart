@@ -1,16 +1,9 @@
 import 'package:cgk/message_exception.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 class QA {
   final String question;
@@ -209,7 +202,7 @@ class _AddQuestionState extends State<AddQuestion> {
           ),
         ),
         SizedBox(
-          height: 15,
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
         TextFormField(
           maxLines: 4,
@@ -230,7 +223,7 @@ class _AddQuestionState extends State<AddQuestion> {
           ),
         ),
         SizedBox(
-          height: 15,
+          height: MediaQuery.of(context).size.height * 0.015,
         ),
         ValueUnionStateListener(
           unionListenable: addQuestionState,
@@ -363,10 +356,10 @@ class _adminChangeState extends State<adminChange> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 7,
+                      height: MediaQuery.of(context).size.height / 7.5,
                     ),
                     SizedBox(
-                      height: 450,
+                      height: MediaQuery.of(context).size.height * 0.6,
                       width: MediaQuery.of(context).size.width - 10,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -493,7 +486,7 @@ class _adminChangeState extends State<adminChange> {
                       ),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: MediaQuery.of(context).size.height * 0.02,
                     ),
                     ElevatedButton(
                       style: ButtonStyle(

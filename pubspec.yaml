@@ -38,14 +38,14 @@ dependencies:
   supabase_flutter: ^2.3.4
   percent_indicator: ^4.2.3
   email_validator: '^2.1.16'
-  vibration: ^1.8.4
   audioplayers: ^6.0.0
   shared_preferences: ^2.2.2
   image_picker: ^1.0.7
   http: ^1.2.1
   flutter_svg: any
   flutter_svg_provider: ^1.0.0
-
+  vibration: ^1.8.4
+  uuid: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -83,7 +83,7 @@ flutter:
      - assets/Group 4.svg
      - assets/Group 5.svg
      - assets/Group 6.svg
-
+     - assets/teamIcon.png
 
 
 

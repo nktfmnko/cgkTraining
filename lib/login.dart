@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/signup.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
@@ -9,14 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 String? userEmail;
 bool isLogin = false;
@@ -93,8 +86,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 170,
-      width: 300,
+      height: MediaQuery.of(context).size.height * 0.22,
+      width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
           TextFormField(
@@ -119,7 +112,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: MediaQuery.of(context).size.height * 0.035,
           ),
           ValueUnionStateListener<void>(
             unionListenable: forgotState,
@@ -199,27 +192,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<List<UserInfo>> readLogins() async {
     final response = await supabase.from('users').select('email, password');
-    return TypeCast(response)
+    return response
         .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
           (e) => UserInfo(
-              mail: TypeCast(e['email']).safeCast<String>(),
-              password: TypeCast(e['password']).safeCast<String>()),
+              mail: e['email'].safeCast<String>(),
+              password: e['password'].safeCast<String>()),
         )
         .toList();
   }
 
   bool correctFields({required String mail, required String password}) {
     return mail.isNotEmpty && password.isNotEmpty;
-  }
-
-  bool correctLogin(List<UserInfo> users) {
-    for (final user in users) {
-      if (user.mail == mailController.text &&
-          user.password == passwordController.text) return true;
-    }
-    return false;
   }
 
   Future<void> login() async {
@@ -233,12 +218,13 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       isPressState.value = !isPressState.value;
 
-      final userInfo = await readLogins();
-      if (!correctLogin(userInfo)) {
+      final response = await supabase.from('users').select('email, password').eq('email', mailController.text).eq('password', passwordController.text);
+      if (response.isEmpty) {
         loginState.error(MessageException('Неверный логин или пароль'));
         isPressState.value = !isPressState.value;
         return;
       }
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString("mail", mailController.text);
       prefs.setBool("isLogin", true);
@@ -273,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height / 4.5,
+                  height: MediaQuery.of(context).size.height / 4,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,8 +289,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.032,
                     ),
                     ValueListenableBuilder<bool>(
                       valueListenable: obscureTextState,
@@ -343,8 +329,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       },
                     ),
-                    const SizedBox(
-                      height: 1,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.001,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -373,6 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.05,
                       width: double.infinity,
                       child: ValueUnionStateListener(
                         unionListenable: loginState,
@@ -437,8 +424,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.015,
                 ),
                 TextButton(
                   onPressed: () {

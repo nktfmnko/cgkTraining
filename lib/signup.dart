@@ -1,20 +1,13 @@
 import 'package:cgk/login.dart';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -70,12 +63,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<List<String>> readMails() async {
     final response = await supabase.from('users').select('email');
-    return TypeCast(response)
+    return response
         .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
-        .map(
-          (e) => TypeCast(e['email']).safeCast<String>(),
-        )
+        .map((e) => e.safeCast<Map<String, Object?>>())
+        .map((e) => e['email'].safeCast<String>())
         .toList();
   }
 
@@ -164,8 +155,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     TextFormField(
                       cursorColor: Colors.white,
@@ -200,8 +191,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     ValueListenableBuilder<bool>(
                       valueListenable: obscureTextState,
@@ -248,10 +239,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                       },
                     ),
-                    const SizedBox(
-                      height: 20,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.025,
                     ),
                     SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.05,
                       width: double.infinity,
                       child: ValueUnionStateListener<void>(
                         unionListenable: registerState,
