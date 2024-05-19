@@ -19,9 +19,6 @@ class _StateTimerPageState extends State<StateTimerPage> with AutomaticKeepAlive
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final size = MediaQuery
-        .of(context)
-        .size;
     return Center(
         child: DefaultTabController(
             length: 3,
