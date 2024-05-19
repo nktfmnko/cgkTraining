@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/statistics.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class makeTeam extends StatefulWidget {
   const makeTeam({super.key});
@@ -21,6 +25,7 @@ class _makeTeamState extends State<makeTeam> {
   final isPressState = ValueNotifier<bool>(false);
   final createState = UnionStateNotifier<void>(UnionState$Content(null));
   final teamName = TextEditingController();
+  File? _selectedImage;
 
   Future<List<user>> readUsers() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -30,7 +35,7 @@ class _makeTeamState extends State<makeTeam> {
         .neq('name', 'admin')
         .neq('email', '${prefs.getString("mail")}')
         .eq('team_id', 0);
-    return TypeCast(response)
+    return response
         .safeCast<List<Object?>>()
         .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
         .map(
@@ -58,10 +63,10 @@ class _makeTeamState extends State<makeTeam> {
     }
   }
 
-  Future<void> sendInvites(List<user> list, int teamId) async {
+  Future<void> sendInvites(List<user> list, String code, String team) async {
     final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
-    for (int i = 0; i < list.length - 1; i++) {
-      if(_isChecked[i]){
+    for (int i = 0; i <= list.length - 1; i++) {
+      if (_isChecked[i]) {
         await http.post(
           url,
           headers: {
@@ -74,8 +79,8 @@ class _makeTeamState extends State<makeTeam> {
               'template_id': 'template_8hairan',
               'user_id': 'RK2JAm99g7P7VusxQ',
               'template_params': {
-                'to_email': '${list[i].email}',
-                'message': 'cgk.app/team/${teamId}',
+                'to_email': list[i].email,
+                'message': 'Код вступления в команду ${team} : ${code}',
               }
             },
           ),
@@ -107,9 +112,13 @@ class _makeTeamState extends State<makeTeam> {
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
+      final randomUuid = const Uuid().v4();
+      final encodedUuid = base64Encode(randomUuid.codeUnits);
+
       await Supabase.instance.client.from('teams').insert({
         'team_name': teamName.text,
-        'capitan': '${prefs?.getString('mail') ?? ""}'
+        'capitan': '${prefs.getString('mail') ?? ""}',
+        'code': encodedUuid
       });
 
       Future.delayed(Duration(seconds: 1));
@@ -119,13 +128,48 @@ class _makeTeamState extends State<makeTeam> {
           .select('id')
           .eq('team_name', teamName.text);
 
-      await Supabase.instance.client.from('users').update(
-          {'team_id': teamId}).eq('email', '${prefs?.getString('mail') ?? ""}');
+      await Supabase.instance.client
+          .from('users')
+          .update({'team_id': teamId.last.values.last}).eq(
+              'email', '${prefs.getString('mail') ?? ""}');
 
-      sendInvites(list, teamId.last.values.last);
+      if (_selectedImage != null) {
+        await Supabase.instance.client.storage
+            .from('pictures')
+            .upload(_selectedImage?.path ?? '', _selectedImage!);
+        await Supabase.instance.client.from('teams').update({
+          'photo':
+              '${await Supabase.instance.client.storage.from('pictures').getPublicUrl('${_selectedImage?.path}')}'
+        }).eq('id', teamId.last.values.last);
+      }
+
+      sendInvites(list, encodedUuid, teamName.text);
+      isPressState.value = !isPressState.value;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const menu()),
+        (route) => false,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Команда создана!'),
+        ),
+      );
     } on Exception {
       createState.error(MessageException('Произошла ошибка, повторите'));
       isPressState.value = !isPressState.value;
+    }
+  }
+
+  Future<void> takeTeamPicture() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+      setState(() {
+        _selectedImage = File(image!.path);
+      });
+    } on Exception catch (e) {
+      throw new Exception(e);
     }
   }
 
@@ -156,34 +200,56 @@ class _makeTeamState extends State<makeTeam> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 50,
+                      height: MediaQuery.of(context).size.height * 0.055,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: TextFormField(
-                        controller: teamName,
-                        keyboardType: TextInputType.text,
-                        cursorColor: Colors.white,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.person_outline_outlined,
-                            color: Colors.white,
-                          ),
-                          labelText: 'Название команды',
-                          labelStyle: TextStyle(color: Colors.white),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            height: MediaQuery.of(context).size.width * 0.35,
+                            child: InkWell(
+                              onTap: () {
+                                takeTeamPicture();
+                              },
+                              child: _selectedImage != null
+                                  ? Image.file(_selectedImage!)
+                                  : Image.asset('assets/teamIcon.png'),
+                            ),
                           ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            child: TextFormField(
+                              controller: teamName,
+                              keyboardType: TextInputType.text,
+                              cursorColor: Colors.white,
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.person_outline_outlined,
+                                  color: Colors.white,
+                                ),
+                                labelText: 'Название команды',
+                                labelStyle: TextStyle(color: Colors.white),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black, width: 1.5),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black, width: 1.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
                       height: 450,

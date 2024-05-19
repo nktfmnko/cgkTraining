@@ -1,8 +1,8 @@
 import 'package:cgk/login.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -51,13 +51,13 @@ class _statState extends State<stat> {
         .select('rightAnswers, selectedQuestions')
         .eq('email',
             '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
-    final data = TypeCast(response)
+    final data = response
         .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
           (e) => userStat(
-            answered: TypeCast(e['rightAnswers']).safeCast<int>(),
-            selected: TypeCast(e['selectedQuestions']).safeCast<int>(),
+            answered: e['rightAnswers'].safeCast<int>(),
+            selected: e['selectedQuestions'].safeCast<int>(),
           ),
         )
         .toList();
@@ -299,7 +299,7 @@ class _statState extends State<stat> {
                             return Row(
                               children: [
                                 SizedBox(
-                                  width: 60,
+                                  width: MediaQuery.of(context).size.width * 0.17,
                                   child: Center(
                                     child: Text(
                                       (index + 1).toString(),
@@ -323,10 +323,9 @@ class _statState extends State<stat> {
                                 ),
                                 const SizedBox(
                                   width: 5,
-                                  height: 10,
                                 ),
                                 SizedBox(
-                                  width: 190,
+                                  width: MediaQuery.of(context).size.width * 0.6,
                                   child: Text(
                                     content[index].name,
                                     style: const TextStyle(
@@ -334,7 +333,7 @@ class _statState extends State<stat> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: 50,
+                                  width: MediaQuery.of(context).size.width * 0.1,
                                   child: Center(
                                     child: Text(
                                       value == "POINT"
@@ -344,7 +343,7 @@ class _statState extends State<stat> {
                                               : (content[index].time /
                                                       content[index]
                                                           .timeAnswered)
-                                                  .toStringAsFixed(2),
+                                                  .toStringAsFixed(1),
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 17),
                                     ),

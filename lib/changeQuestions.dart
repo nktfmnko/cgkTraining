@@ -1,16 +1,9 @@
 import 'package:cgk/message_exception.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 class QA {
   final String question;

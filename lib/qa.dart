@@ -3,21 +3,13 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cgk/login.dart';
 import 'package:cgk/menu.dart';
 import 'package:cgk/select_questions.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:cgk/union_state.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vibration/vibration.dart';
-
-//парсинг к нужному типу
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 //класс для вопросов и ответов
 class QA {
@@ -71,11 +63,11 @@ Future<void> addValue<T>(T value, String column) async {
         .from('users')
         .select('email, $column')
         .eq('email',
-            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+            '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
     await Supabase.instance.client
         .from('users')
         .update({'$column': data.last.values.last + value}).eq('email',
-            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+            '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
   } on Exception {
     throw new Exception('Ошибка');
   }
@@ -156,15 +148,16 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver {
 
   //чтение данных из бд
   Future<List<QA>> readData() async {
-    final response = await Supabase.instance.client.from('questions').select();
-    return TypeCast(response)
-        .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+    final response = await Supabase.instance.client.rpc<List<Object?>>(
+        'random_questions',
+        params: {'count': selected.toInt()});
+    return response
+        .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
           (e) => QA(
-            id: TypeCast(e['id']).safeCast<int>(),
-            question: TypeCast(e['question']).safeCast<String>(),
-            answer: TypeCast(e['answer']).safeCast<String>(),
+            id: e['id'].safeCast<int>(),
+            question: e['question'].safeCast<String>(),
+            answer: e['answer'].safeCast<String>(),
           ),
         )
         .toList();
@@ -175,9 +168,8 @@ class _TrainingState extends State<Training> with WidgetsBindingObserver {
     try {
       qaState.value = UnionState$Loading();
       final data = await readData();
-      data.shuffle();
       addValue(selected.toInt(), 'selectedQuestions');
-      qaState.value = UnionState$Content(data.take(selected.toInt()).toList());
+      qaState.value = UnionState$Content(data);
     } on Exception catch (e) {
       qaState.value = UnionState$Error(e);
     }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
 import 'package:cgk/signup.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:email_validator/email_validator.dart';
@@ -9,14 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 String? userEmail;
 bool isLogin = false;
@@ -93,7 +86,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.19,
+      height: MediaQuery.of(context).size.height * 0.22,
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
@@ -199,13 +192,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<List<UserInfo>> readLogins() async {
     final response = await supabase.from('users').select('email, password');
-    return TypeCast(response)
+    return response
         .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
           (e) => UserInfo(
-              mail: TypeCast(e['email']).safeCast<String>(),
-              password: TypeCast(e['password']).safeCast<String>()),
+              mail: e['email'].safeCast<String>(),
+              password: e['password'].safeCast<String>()),
         )
         .toList();
   }

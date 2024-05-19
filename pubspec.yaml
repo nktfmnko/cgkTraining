@@ -45,7 +45,7 @@ dependencies:
   flutter_svg: any
   flutter_svg_provider: ^1.0.0
   vibration: ^1.8.4
-  app_links:
+  uuid: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -83,7 +83,7 @@ flutter:
      - assets/Group 4.svg
      - assets/Group 5.svg
      - assets/Group 6.svg
-
+     - assets/teamIcon.png
 
 
 

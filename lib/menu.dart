@@ -1,25 +1,19 @@
 import 'dart:io';
+
 import 'package:cgk/changeQuestions.dart';
 import 'package:cgk/login.dart';
 import 'package:cgk/main.dart';
-import 'package:cgk/team.dart';
 import 'package:cgk/select_questions.dart';
+import 'package:cgk/statistics.dart';
+import 'package:cgk/team.dart';
 import 'package:cgk/timer.dart';
+import 'package:cgk/type_cast.dart';
 import 'package:cgk/union_state.dart';
 import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:cgk/statistics.dart';
-
-extension TypeCast<T> on T? {
-  R safeCast<R>() {
-    final value = this;
-    if (value is R) return value;
-    throw Exception('не удалось привести тип $runtimeType к типу $R');
-  }
-}
 
 late int haveTeam;
 
@@ -67,19 +61,19 @@ class _menu extends State<menu> {
         .select(
             'name, rightAnswers, time, picture, admin, timeAnswered, team_id')
         .eq('email',
-            '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
-    final data = TypeCast(response)
+            '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
+    final data = response
         .safeCast<List<Object?>>()
-        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map((e) => e.safeCast<Map<String, Object?>>())
         .map(
           (e) => userWithPic(
-              name: TypeCast(e['name']).safeCast<String>(),
-              answered: TypeCast(e['rightAnswers']).safeCast<int>(),
-              time: TypeCast(e['time']).safeCast<int>(),
-              picture: TypeCast(e['picture']).safeCast<String>(),
-              admin: TypeCast(e['admin']).safeCast<bool>(),
-              time_answered: TypeCast(e['timeAnswered']).safeCast<int>(),
-              team_id: TypeCast(e['team_id']).safeCast<int>()),
+              name: e['name'].safeCast<String>(),
+              answered: e['rightAnswers'].safeCast<int>(),
+              time: e['time'].safeCast<int>(),
+              picture: e['picture'].safeCast<String>(),
+              admin: e['admin'].safeCast<bool>(),
+              time_answered: e['timeAnswered'].safeCast<int>(),
+              team_id: e['team_id'].safeCast<int>()),
         )
         .toList();
     haveTeam = data.last.team_id;
@@ -149,7 +143,7 @@ class _menu extends State<menu> {
         'picture':
             '${await Supabase.instance.client.storage.from('pictures').getPublicUrl('${image?.path}')}'
       }).eq(
-          'email', '${isLogin ? (prefs?.getString('mail') ?? "") : userEmail}');
+          'email', '${isLogin ? (prefs.getString('mail') ?? "") : userEmail}');
       updateScreen();
     } on Exception catch (e) {
       throw new Exception(e);
