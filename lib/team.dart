@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cgk/makeTeam.dart';
 import 'package:cgk/menu.dart';
 import 'package:cgk/message_exception.dart';
@@ -8,6 +10,7 @@ import 'package:cgk/value_union_state_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class TeamScore {
   final String name;
@@ -16,6 +19,288 @@ class TeamScore {
 
   const TeamScore(
       {required this.name, required this.score, required this.photo});
+}
+
+class SendInvite extends StatefulWidget {
+  const SendInvite({super.key});
+
+  @override
+  State<SendInvite> createState() => _SendInviteState();
+}
+
+class _SendInviteState extends State<SendInvite> {
+  late List<bool> _isChecked;
+  final teamState = ValueNotifier<UnionState<List<user>>>(UnionState$Loading());
+  final isPressState = ValueNotifier<bool>(false);
+  final createState = UnionStateNotifier<void>(UnionState$Content(null));
+
+  Future<List<user>> readUsers() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await Supabase.instance.client
+        .from('users')
+        .select('name, rightAnswers, time, timeAnswered, picture, email')
+        .neq('name', 'admin')
+        .neq('email', '${prefs.getString("mail")}')
+        .eq('team_id', 0);
+    return response
+        .safeCast<List<Object?>>()
+        .map((e) => TypeCast(e).safeCast<Map<String, Object?>>())
+        .map(
+          (e) => user(
+              email: TypeCast(e['email']).safeCast<String>(),
+              name: TypeCast(e['name']).safeCast<String>(),
+              answered: TypeCast(e['rightAnswers']).safeCast<int>(),
+              time: TypeCast(e['time']).safeCast<int>(),
+              timeAnswered: TypeCast(e['timeAnswered']).safeCast<int>(),
+              picture: TypeCast(e['picture']).safeCast<String>()),
+        )
+        .toList();
+  }
+
+  Future<void> updateTeamList() async {
+    try {
+      teamState.value = UnionState$Loading();
+      final data = await readUsers();
+      _isChecked = List<bool>.filled(data.length, false);
+      teamState.value = UnionState$Content(data);
+    } on Exception catch (e) {
+      teamState.value = UnionState$Error(e);
+    }
+  }
+
+  Future<void> sendInvites(List<user> list, String code, String team) async {
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    for (int i = 0; i <= list.length - 1; i++) {
+      if (_isChecked[i]) {
+        await http.post(
+          url,
+          headers: {
+            'origin': 'http://localhost',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(
+            {
+              'service_id': 'service_23bd6wb',
+              'template_id': 'template_8hairan',
+              'user_id': 'RK2JAm99g7P7VusxQ',
+              'template_params': {
+                'to_email': list[i].email,
+                'message': 'Код вступления в команду ${team} : ${code}',
+              }
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> addMembers(List<user> list) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      isPressState.value = !isPressState.value;
+      setState(() {});
+      final code = await Supabase.instance.client
+          .from('teams')
+          .select('team_name, code')
+          .eq('capitan', '${prefs.getString('mail')}');
+      sendInvites(list, code.last.values.last, code.last.values.first);
+      isPressState.value = !isPressState.value;
+      Navigator.pop(context);
+    } on Exception {
+      createState.error(MessageException('Произошла ошибка, повторите'));
+      isPressState.value = !isPressState.value;
+    }
+  }
+
+  @override
+  void initState() {
+    updateTeamList();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueUnionStateListener(
+      unionListenable: teamState,
+      contentBuilder: (content) {
+        return Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.07,
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              width: MediaQuery.of(context).size.width,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1.5, color: Colors.black),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.5),
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return const Divider(
+                        height: 15,
+                      );
+                    },
+                    itemCount: content.length,
+                    itemBuilder: (context, index) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: content[index].picture.isEmpty
+                                    ? Image.asset("assets/avatar_image.png")
+                                        .image
+                                    : Image(
+                                        image: NetworkImage(
+                                            content[index].picture),
+                                      ).image,
+                                backgroundColor: Colors.black,
+                                radius: 16,
+                              ),
+                              SizedBox(
+                                width: 7,
+                              ),
+                              SizedBox(
+                                child: Text(
+                                  content[index].name,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Checkbox(
+                            value: _isChecked[index],
+                            onChanged: (bool? value) {
+                              _isChecked[index] = value!;
+                              setState(() {});
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            ValueUnionStateListener(
+              unionListenable: createState,
+              contentBuilder: (_) {
+                return ElevatedButton(
+                  onPressed:
+                      isPressState.value ? null : () => addMembers(content),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: isPressState,
+                    builder: (_, isPress, __) {
+                      return isPress
+                          ? CircularProgressIndicator()
+                          : Text(
+                              'Пригласить',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            );
+                    },
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll<Color>(
+                      Color(0xff1b588c),
+                    ),
+                  ),
+                );
+              },
+              loadingBuilder: () {
+                return ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll<Color>(
+                      Color(0xff1b588c),
+                    ),
+                  ),
+                  onPressed: null,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                );
+              },
+              errorBuilder: (exception) {
+                return ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll<Color>(Color(0xff1b588c)),
+                  ),
+                  onPressed:
+                      isPressState.value ? null : () => addMembers(content),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: isPressState,
+                    builder: (_, isPress, __) {
+                      return isPress
+                          ? CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : Text(
+                              exception.toString(),
+                              style: TextStyle(color: Colors.white),
+                            );
+                    },
+                  ),
+                );
+              },
+            )
+          ],
+        );
+      },
+      loadingBuilder: () {
+        return SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.white,
+                )
+              ],
+            ),
+          ),
+        );
+      },
+      errorBuilder: (_) {
+        return SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Ошибка, перезагрузите страницу',
+                  style: TextStyle(color: Colors.white),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      const Color(0xff3987C8),
+                    ),
+                    shadowColor: MaterialStateProperty.all(
+                      const Color(0xff3987C8),
+                    ),
+                  ),
+                  onPressed: () {
+                    updateTeamList();
+                  },
+                  child: const Text('Обновить',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class TeamsLeaderboard extends StatefulWidget {
@@ -125,9 +410,9 @@ class _TeamsLeaderboardState extends State<TeamsLeaderboard> {
                             child: content[index].photo.isEmpty
                                 ? Image.asset("assets/teamIcon.png")
                                 : Image(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(content[index].photo),
-                            ),
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(content[index].photo),
+                                  ),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.61,
@@ -338,9 +623,43 @@ class _HaveTeamScreenState extends State<HaveTeamScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        width: 28,
-                      ),
+                      prefs.getString('mail') == capitan
+                          ? SizedBox(
+                              width: 28,
+                              height: 28,
+                              child: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        contentPadding: EdgeInsets.zero,
+                                        insetPadding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.1,
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.1,
+                                            left: 20,
+                                            right: 20),
+                                        backgroundColor: Color(0xff4397de),
+                                        content: SendInvite(),
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.add),
+                                iconSize: 28,
+                                padding: EdgeInsets.all(0.0),
+                                color: Colors.black,
+                              ),
+                            )
+                          : SizedBox(
+                              width: 28,
+                            ),
                       Row(
                         children: [
                           SizedBox(
