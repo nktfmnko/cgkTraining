@@ -29,7 +29,7 @@ class _StateTimerPageState extends State<StateTimerPage> with AutomaticKeepAlive
               appBar: AppBar(
                 backgroundColor: const Color(0xff4397de),
                 centerTitle: true,
-                title: const Text("Таймеры"),
+                title: const Text("Таймеры", style: TextStyle(color: Colors.white)),
                 automaticallyImplyLeading: false,
                 bottom: TabBar(
                     indicatorColor: const Color(0xff418ecd),
