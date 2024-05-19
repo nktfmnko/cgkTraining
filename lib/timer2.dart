@@ -12,12 +12,15 @@ class StateTimer2Page extends StatefulWidget {
 }
 
 // Класс Таймера
-class _StateTimer2PageState extends State<StateTimer2Page> with WidgetsBindingObserver{
+class _StateTimer2PageState extends State<StateTimer2Page> with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<StateTimer2Page> {
   Timer? _timer;
   late int _waitTime;
   var _percent = 1.0;
   var isStart = false;
   var timeStr = '05:00';
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -89,6 +92,7 @@ class _StateTimer2PageState extends State<StateTimer2Page> with WidgetsBindingOb
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xff3987c8),
