@@ -40,6 +40,8 @@
  - Создание команды, удаление и добавление участников команды
  - Добавлен рейтинг команд
 
+### Код подключения к тестовой команде: ODg5N2YwMjctOTBkMy00ZWNjLWI5NWItNzc4NDIwZDAwZDQ2
+
 Вопросы взяты из открытой [базы вопросов ЧГК](https://db.chgk.info/)
 
 [Ссылка](https://www.figma.com/file/KbnD2lkSnDIXKaCmrNil0W/Untitled?type=design&node-id=0-1&mode=design&t=3uX4emUu0RUKxezj-0) на дизайн в Figma
